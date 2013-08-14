@@ -3,7 +3,10 @@ Created on 13.08.2013
 
 @author: hannes
 '''
-from os import popen
+from fcntl import ioctl
+from array import array
+from struct import unpack, pack
+from socket import socket, inet_ntoa, AF_INET, SOCK_DGRAM
 from thread import start_new_thread
 from network.serverReader import ServerReader
 
@@ -20,21 +23,40 @@ class ServerManager(object):
         self.serverReader = []
         self.exceptIps = ["127.0.0.1"]
     
+    @staticmethod
+    def localifs():
+        """
+        Used to get a list of the up interfaces and associated IP addresses
+        on this machine (linux only).
+    
+        Returns:
+            List of interface tuples.  Each tuple consists of
+            (interface name, interface IP)
+        """
+        SIOCGIFCONF = 0x8912
+        MAXBYTES = 8096
+        
+        var1 = 32
+        var2 = 32
+    
+        sock = socket(AF_INET, SOCK_DGRAM)
+        names = array('B', '\0' * MAXBYTES)
+        outbytes = unpack('iL', ioctl(sock.fileno(), SIOCGIFCONF, pack('iL', MAXBYTES, names.buffer_info()[0]) ))[0]
+    
+        namestr = names.tostring()
+        return [(namestr[i:i+var1].split('\0', 1)[0], inet_ntoa(namestr[i+20:i+24])) for i in xrange(0, outbytes, var2)]
+        
     '''
-    Gets alist of ip addresses form ifconfig command
+    Gets alist of ip addresses
     '''
     @staticmethod
     def getIpAdresses(_except=[]):
         ips = []
-        stream = popen("ifconfig | grep \"inet addr:\"")
         
         # extract ip
-        for line in stream:
-            line = line.split()
-            if len(line) > 1:
-                line = line[1].split(":")
-                if len(line) > 1 and line[1] not in _except:
-                    ips.append(line[1]) 
+        for dev in ServerManager.localifs():
+            if len(dev) > 1 and dev[1] not in _except:
+                ips.append(dev[1])           
             
         return ips
     
