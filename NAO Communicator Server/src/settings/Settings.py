@@ -9,5 +9,7 @@ class Settings(object):
     Settings class
     '''
 
-    naoHostName = "localhost"
+    naoHostName = "192.168.0.111"
     serverDefaultIP = "127.0.0.1"
+    serverDefaultPort = 5050
+    serverServiceType = "_naocom._tcp"

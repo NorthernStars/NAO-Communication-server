@@ -41,10 +41,10 @@ class ServerReader(object):
                     print "recieved data = " + str(data)
                 
                     # resolve command
-                    ret = NAOCommand.resolveCmd(data, addr)
+                    ret = NAOCommand.resolveCmd( eval(data), addr)
                 
                     # check if command was successfully executed
-                    if ret == "restart":
+                    if not ret:
                         print "RESTART CONNECTION"
                         self.server.close(True)
                     

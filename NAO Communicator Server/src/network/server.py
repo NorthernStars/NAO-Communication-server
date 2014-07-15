@@ -20,7 +20,7 @@ class NAOServer(object):
 	__init = False
 
 
-	def __init__(self, restart=False, host="localhost", port=5050, framesize=1024):
+	def __init__(self, restart=False, host=Settings.serverDefaultIP, port=Settings.serverDefaultPort, framesize=1024):
 		'''
 		Constructor
 		'''

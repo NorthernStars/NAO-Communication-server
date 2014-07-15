@@ -91,5 +91,5 @@ class NAOCommand(object):
 		if not ret:
 			print "could find command", str(data[0])
 				
-		return True
+		return ret
 
