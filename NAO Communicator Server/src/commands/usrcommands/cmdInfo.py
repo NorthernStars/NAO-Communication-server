@@ -20,7 +20,7 @@ class cmdInfo(object):
         if len(args) != 2 and addr != None:
             pass
         
-        sentinel = ALProxy('ALSentinel', Settings.naoHostName, 9559)
+        sentinel = ALProxy('ALSentinel', Settings.naoHostName, Settings.naoPort)
         battery = sentinel.getBatteryLevel()
         robotName = socket.gethostname()
         remoteHost = addr[0]

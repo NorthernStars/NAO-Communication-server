@@ -21,7 +21,7 @@ class cmdSay(object):
 			return False
 		
 		# create proxy
-		tts = ALProxy('ALTextToSpeech', Settings.naoHostName, 9559)
+		tts = ALProxy('ALTextToSpeech', Settings.naoHostName, Settings.naoPort)
 		
 		# create sentence	
 		sentence = "\RSPD="+ str( args[2] ) + "\ "

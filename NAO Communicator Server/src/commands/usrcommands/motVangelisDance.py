@@ -132,7 +132,7 @@ class motVangelisDance(object):
         try:
             # uncomment the following line and modify the IP if you use this script outside Choregraphe.
             # motion = ALProxy("ALMotion", IP, 9559)
-            motion = ALProxy("ALMotion", Settings.naoHostName, 9559)
+            motion = ALProxy("ALMotion", Settings.naoHostName, Settings.naoPort)
             self.ready = True
             motion.angleInterpolationBezier(names, times, keys);
         except BaseException, err:

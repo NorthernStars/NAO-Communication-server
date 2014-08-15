@@ -21,7 +21,7 @@ class cmdEvolutionDance(object):
         
     def exe(self, args=None, addr=None):
         # raise micro event
-        mem = ALProxy("ALMemory", Settings.naoHostName, 9559)
+        mem = ALProxy("ALMemory", Settings.naoHostName, Settings.naoPort)
         self.ready = True
         mem.raiseMicroEvent("NAOComEvolutionDance", True)
         

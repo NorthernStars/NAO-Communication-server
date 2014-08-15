@@ -19,7 +19,7 @@ class motHands(object):
     
     def openHand(self, args=None):
         try:
-            motion = ALProxy("ALMotion", Settings.naoHostName, 9559)
+            motion = ALProxy("ALMotion", Settings.naoHostName, Settings.naoPort)
             if args != None:
                 motion.openHand(args)
             else:
@@ -29,7 +29,7 @@ class motHands(object):
     
     def closeHand(self, args=None):
         try:
-            motion = ALProxy("ALMotion", Settings.naoHostName, 9559)
+            motion = ALProxy("ALMotion", Settings.naoHostName, Settings.naoPort)
             if args != None:
                 motion.closeHand(args)
             else:

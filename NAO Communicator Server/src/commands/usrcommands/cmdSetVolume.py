@@ -20,7 +20,7 @@ class cmdSetVolume(object):
     def exe(self, args=None, addr=None):
         
         # get proxies
-        audio = ALProxy("ALAudioDevice", Settings.naoHostName, 9559)
+        audio = ALProxy("ALAudioDevice", Settings.naoHostName, Settings.naoPort)
         
         # get volume
         volume = 100

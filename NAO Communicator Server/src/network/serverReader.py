@@ -21,27 +21,27 @@ class ServerReader(object):
         self.restarted = False
         self.server = None
     
-    def exe(self):
-        
+    def exe(self):    
         while self.run:
         
             # create & connect server
             self.server = NAOServer(self.restarted, self.host)
+            if not self.server.isConnected():
+                self.close()
+            
             self.restarted = True
             
             # recieve data
             while self.server.active() and self.run:
                 
-                data = ()
-                addr = ""
-                
                 ret = self.server.read()
                 if ret:
                     data, addr = ret
-                    print "recieved data = " + str(data)
+                    print "recieved data = ", data
                 
                     # resolve command
                     ret = NAOCommand.resolveCmd( eval(data), addr)
+                    ret = True
                 
                     # check if command was successfully executed
                     if not ret:

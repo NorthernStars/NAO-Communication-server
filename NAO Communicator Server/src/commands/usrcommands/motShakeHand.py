@@ -49,7 +49,7 @@ class motShakeHand(object):
         keys.append([ [ 0.08279, [ 3, -0.26667, 0.00000], [ 3, 0.00000, 0.00000]]])
         
         try:
-            motion = ALProxy("ALMotion", Settings.naoHostName, 9559)
+            motion = ALProxy("ALMotion", Settings.naoHostName, Settings.naoPort)
             motion.angleInterpolationBezier(names, times, keys);
         except BaseException, err:
             print err
@@ -79,7 +79,7 @@ class motShakeHand(object):
         keys.append([ [ -0.03993, [ 3, -0.16000, 0.00000], [ 3, 0.17333, 0.00000]], [ -0.06140, [ 3, -0.17333, 0.00000], [ 3, 0.16000, 0.00000]], [ -0.05987, [ 3, -0.16000, 0.00000], [ 3, 0.17333, 0.00000]], [ -0.05987, [ 3, -0.17333, 0.00000], [ 3, 0.16000, 0.00000]], [ -0.06447, [ 3, -0.16000, 0.00000], [ 3, 0.17333, 0.00000]], [ -0.06294, [ 3, -0.17333, 0.00000], [ 3, 0.00000, 0.00000]]])
                 
         try:
-            motion = ALProxy("ALMotion", Settings.naoHostName, 9559)
+            motion = ALProxy("ALMotion", Settings.naoHostName, Settings.naoPort)
             motion.angleInterpolationBezier(names, times, keys);
         except BaseException, err:
             print err

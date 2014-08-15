@@ -32,7 +32,7 @@ class cmdVelocityWalk(object):
         
         # create proxy
         print "velocityWalk", x, y, theta, frequency
-        motion = ALProxy("ALMotion", Settings.naoHostName, 9559)
+        motion = ALProxy("ALMotion", Settings.naoHostName, Settings.naoPort)
         motion.setWalkTargetVelocity(x, y, theta, frequency)
         
         

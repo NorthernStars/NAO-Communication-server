@@ -20,7 +20,7 @@ class cmdHallo(object):
     def exe(self, args=None, addr=None):
         
         # create proxy
-        tts = naoqi.ALProxy('ALTextToSpeech', Settings.naoHostName, 9559)
+        tts = naoqi.ALProxy('ALTextToSpeech', Settings.naoHostName, Settings.naoPort)
         
         # create movement
         mot = motHallo()

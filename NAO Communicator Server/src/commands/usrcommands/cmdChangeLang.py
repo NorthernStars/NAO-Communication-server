@@ -21,8 +21,8 @@ class cmdChangelang(object):
     def exe(self, args=None, addr=None):
         
         # get proxies
-        tts = ALProxy("ALTextToSpeech", Settings.naoHostName, 9559)
-        asr = ALProxy("ALSpeechRecognition", Settings.naoHostName, 9559)
+        tts = ALProxy("ALTextToSpeech", Settings.naoHostName, Settings.naoPort)
+        asr = ALProxy("ALSpeechRecognition", Settings.naoHostName, Settings.naoPort)
         
         # get language
         lang =str( args[1] )

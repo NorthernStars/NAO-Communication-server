@@ -17,7 +17,7 @@ class ledLaugh(object):
         '''
         Constructor
         '''
-        self.ALLeds = ALProxy("ALLeds", Settings.naoHostName, 9559)
+        self.ALLeds = ALProxy("ALLeds", Settings.naoHostName, Settings.naoPort)
         self.cmd = "ledLaugh"
         self.running = False
         

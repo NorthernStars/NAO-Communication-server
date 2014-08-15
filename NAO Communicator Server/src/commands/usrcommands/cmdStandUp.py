@@ -18,7 +18,7 @@ class cmdStandUp(object):
     def exe(self, args=None, addr=None):
         
         # create proxy
-        postureProxy = ALProxy("ALRobotPosture", Settings.naoHostName, 9559)
+        postureProxy = ALProxy("ALRobotPosture", Settings.naoHostName, Settings.naoPort)
         
         # stand up
         postureProxy.goToPosture("Stand", 0.8)

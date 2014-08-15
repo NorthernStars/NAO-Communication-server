@@ -31,7 +31,7 @@ class cmdCaravanPalace(object):
         while not mot.ready:
             pass
         sleep(1)
-        player = ALProxy('ALAudioPlayer', Settings.naoHostName, 9559)
+        player = ALProxy('ALAudioPlayer', Settings.naoHostName, Settings.naoPort)
         player.post.playFileFromPosition("/home/nao/sounds/caravanPalace.wav", 0, 1.0, 0.0)
  
  
@@ -42,7 +42,7 @@ class caravanPalaceLedAnimation(object):
     
     def exe(self):
         
-        ALLeds = ALProxy("ALLeds", Settings.naoHostName, 9559)
+        ALLeds = ALProxy("ALLeds", Settings.naoHostName, Settings.naoPort)
         
         sleep(0.24)
         rDuration = 0.05;

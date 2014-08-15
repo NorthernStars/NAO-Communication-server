@@ -18,8 +18,8 @@ class cmdSitDown(object):
     def exe(self, args=None, addr=None):
         
         # create proxy
-        postureProxy = ALProxy("ALRobotPosture", Settings.naoHostName, 9559)
-        motion = ALProxy("ALMotion", Settings.naoHostName, 9559)
+        postureProxy = ALProxy("ALRobotPosture", Settings.naoHostName, Settings.naoPort)
+        motion = ALProxy("ALMotion", Settings.naoHostName, Settings.naoPort)
         
         # sit down
         postureProxy.goToPosture("SitRelax", 0.8)

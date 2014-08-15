@@ -16,7 +16,7 @@ class cmdRedBallTracker(object):
     def __init__(self):
         self.cmd = "trackBall"
         self.started = False
-        self.trackerProxy = ALProxy("ALRedBallTracker", Settings.naoHostName, 9559)
+        self.trackerProxy = ALProxy("ALRedBallTracker", Settings.naoHostName, Settings.naoPort)
         self.trackerProxy.setWholeBodyOn(True)
     
     def exe(self, args=None, addr=None):
@@ -26,7 +26,7 @@ class cmdRedBallTracker(object):
         if(not self.trackerProxy.isActive()):
             
             # init position
-            postureProxy =  ALProxy("ALRobotPosture", Settings.naoHostName, 9559)
+            postureProxy =  ALProxy("ALRobotPosture", Settings.naoHostName, Settings.naoPort)
             postureProxy.goToPosture("StandInit", 0.8)            
             
             # say

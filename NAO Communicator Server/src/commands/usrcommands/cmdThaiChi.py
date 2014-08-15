@@ -21,5 +21,5 @@ class cmdThaiChi(object):
         start_new_thread( motThaiChi().exe, () )
         
         # play sound
-        player = ALProxy('ALAudioPlayer', Settings.naoHostName, 9559)
+        player = ALProxy('ALAudioPlayer', Settings.naoHostName, Settings.naoPort)
         player.post.playFileFromPosition("/home/nao/sounds/thaichi.mp3", 0, 1.0, 0.0)

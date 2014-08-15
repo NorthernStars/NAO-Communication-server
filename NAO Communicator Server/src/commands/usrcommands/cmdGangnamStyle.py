@@ -29,5 +29,5 @@ class cmdGangnamStyle(object):
         while not mot.ready:
             pass
         sleep(1)
-        player = ALProxy('ALAudioPlayer', Settings.naoHostName, 9559)
+        player = ALProxy('ALAudioPlayer', Settings.naoHostName, Settings.naoPort)
         player.post.playFileFromPosition("/home/nao/sounds/gangnam.wav", 0, 1.0, 0.0)
