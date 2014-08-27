@@ -4,6 +4,12 @@ Created on 07.09.2012
 @author: hannes
 '''
 import socket
+import dataTypes
+import dataCommands
+import dataJoints
+import sys
+import traceback
+from naoqi import ALProxy
 from settings.Settings import Settings
 from commands.usrcommands.cmdSay import cmdSay
 from commands.usrcommands.cmdChangeLang import cmdChangelang
@@ -46,8 +52,7 @@ class NAOServer(object):
 		#self.__sock.settimeout(2.0)
 		self.__connected = self.__connect()
 		
-		if self.__connected:
-			if not restart:	
+		if self.__connected and not restart:	
 				cmdChangelang().exe([None, "English"])		
 				cmdSay().exe([None, "Control server started.", 100, 100])	
 		
@@ -74,12 +79,12 @@ class NAOServer(object):
 					self.__conn, self.__remoteAddr = self.__sock.accept()
 				
 				print "connected to ", self.__remoteAddr
-				self.__connectionHandshake()
-				
-				return True
-			
+				if self.__connectionHandshake():
+					return True
+						
 			except:
 				print "ERROR CONNECTING TO " + str(self.__addr)
+				traceback.print_tb( sys.exc_info()[2] )				
 				
 			return False
 		
@@ -87,8 +92,81 @@ class NAOServer(object):
 	def __connectionHandshake(self):
 		while not self.__connected:
 			ret = self.read()
-			if ret:
-				ret = eval(ret)		
+
+			if ret and len(ret) > 1:
+				data = eval(ret[0])	
+				if 'type' in data and dataTypes.CONNECT in data['type'] and 'command' in data and dataCommands.SYS_CONNECT in data['command']:
+					data = self.createDataResponsePackage(data, True)
+					self.send(data)
+					return True
+		
+		return False
+	
+	def createDataResponsePackage(self, request, success=True):
+		'''
+		Creates data response package
+		'''
+		sysProxy = ALProxy("ALSystem", Settings.naoHostName, Settings.naoPort)
+		batProxy = ALProxy("ALBattery", Settings.naoHostName, Settings.naoPort)
+		
+		data = {
+			'request': request,
+			'requestSuccessfull': success,
+			'naoName': str( sysProxy.robotName() ),
+			'batteryLevel': int( batProxy.getBatteryCharge() ),
+			'stiffnessData': self.__createStiffnessDatapackage(),
+			'audioData': self.__createAudioDatapackage() }
+		return data
+	
+	def __createDataRequestPackage(self, aType, aCommand, aArguments=[] ):
+		'''
+		Creates data request package
+		'''
+		return {'type': aType, 'command': aCommand, 'commandArguments': aArguments}
+	
+	def __createStiffnessDatapackage(self):
+		'''
+		Creates stiffness data package
+		'''
+		motionProxy = ALProxy("ALMotion", Settings.naoHostName, Settings.naoPort)
+		data = {'jointStiffness': {}}
+		for joint in dataJoints.JOINTS:
+			try:
+				stiffnessList = motionProxy.getStiffnesses( dataJoints.JOINTS[joint] )
+				stiffness = 0.0
+				for stiff in stiffnessList:
+					if stiff > 0.0:
+						stiffness += stiff
+				
+				stiffness = stiffness / len(stiffnessList)
+				data['jointStiffness'][ dataJoints.JOINTS[joint] ] = stiffness
+						
+					
+			except:
+				print "ERROR: Unknown joint " + str(joint)
+			
+		return data
+	
+	def __createAudioDatapackage(self):
+		'''
+		Creates audio data package
+		'''
+		ttsProxy = ALProxy("ALTextToSpeech", Settings.naoHostName, Settings.naoPort)
+		playerProxy = ALProxy("ALAudioPlayer", Settings.naoHostName, Settings.naoPort)
+		
+		data = {
+			'masterVolume': playerProxy.getMasterVolume(),
+			'speechVolume': ttsProxy.getVolume(),
+			'speechVoice': ttsProxy.getVoice(),
+			'speechLanguage': ttsProxy.getLanguage(),
+			'speechLanguagesList': ttsProxy.getAvailableLanguages(),
+			'speechVoicesList': ttsProxy.getAvailableVoices(),
+			'speechPitchShift': ttsProxy.getParameter("pitchShift"),
+			'speechDoubleVoice': ttsProxy.getParameter("doubleVoice"),
+			'speechDoubleVoiceLevel': ttsProxy.getParameter("doubleVoiceLevel"),
+			'speechDoubleVoiceTimeShift': ttsProxy.getParameter("doubleVoiceTimeShift")
+			}
+		return data
 		
 		
 	def active(self):
@@ -106,8 +184,7 @@ class NAOServer(object):
 		Reads from socket and return tuple of data (data, adress)
 		'''
 		if self.__sock and self.__conn:
-			try:
-				
+			try:				
 				data = self.__conn.recv(self.__framesize)
 				
 				# if first connect, say something
@@ -121,6 +198,21 @@ class NAOServer(object):
 				pass
 				
 		return False
+	
+	
+	def send(self, data):
+		'''
+		Sends data to socket
+		'''
+		if self.__sock and self.__conn:
+			try:				
+				self.__conn.send( str(data) + "\n" )
+				return True
+			except:
+				pass
+				
+		return False
+	
 	
 	'''
 	Closes the server

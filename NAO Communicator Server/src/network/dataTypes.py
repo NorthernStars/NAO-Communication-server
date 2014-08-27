@@ -1,0 +1,10 @@
+'''
+Created on 26.08.2014
+
+@author: hannes
+'''
+
+CONNECT = "CONNECT"
+DISCONNECT = "DISCONNECT"
+REQUEST = "REQUEST"
+SET = "SET"
