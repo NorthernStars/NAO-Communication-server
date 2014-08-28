@@ -4,15 +4,12 @@ Created on 07.09.2012
 @author: hannes
 '''
 import socket
-import dataTypes
 import dataCommands
 import dataJoints
 import sys
 import traceback
 from naoqi import ALProxy
 from settings.Settings import Settings
-from commands.usrcommands.cmdSay import cmdSay
-from commands.usrcommands.cmdChangeLang import cmdChangelang
 
 class NAOServer(object):
 	'''
@@ -21,7 +18,6 @@ class NAOServer(object):
 
 	__framesize=1024
 	__sock = None
-	__init = False
 	__conn = None
 	__addr = ("", None)
 	__remoteAddr = None
@@ -29,7 +25,7 @@ class NAOServer(object):
 	__connected = False
 
 
-	def __init__(self, restart=False, host=Settings.serverDefaultIP, port=Settings.serverDefaultPort, framesize=1024):
+	def __init__(self, host=Settings.serverDefaultIP, port=Settings.serverDefaultPort, framesize=1024):
 		'''
 		Constructor
 		'''
@@ -45,34 +41,38 @@ class NAOServer(object):
 				self.__addr = (socket.gethostbyname(host), port)
 		except:
 			self.__addr = (Settings.serverDefaultIP, port)
-
-		self.__framesize = framesize	
-		self.__connected = False	
+			
+		self.__framesize = framesize
 		self.__sock = socket.socket(self.__type, socket.SOCK_STREAM)
+		self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		self.__initServer()
+
+		
+	def __initServer(self, reconnect=False):
+		'''
+		Initiates the server
+		'''	
+		self.__connected = False	
 		#self.__sock.settimeout(2.0)
-		self.__connected = self.__connect()
+		self.__connected = self.__connect(reconnect)	
 		
-		if self.__connected and not restart:	
-				cmdChangelang().exe([None, "English"])		
-				cmdSay().exe([None, "Control server started.", 100, 100])	
-		
-	def __connect(self):
+	def __connect(self, reconnect=False):
 		'''
 		connects the socket to the specified adress
 		'''
 		if self.__sock:
 			try:
 
-				# get socket address
-				for family, _, _, _, sockaddr in socket.getaddrinfo( self.__addr[0], self.__addr[1], 0, 0, socket.SOL_TCP ):
-					if family == self.__type:
-						self.__addr = sockaddr
-						break
-	
-				print "binding to " + str(self.__addr)
-				self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-				self.__sock.bind( self.__addr )
-				self.__sock.listen(1)				
+				if not reconnect:
+					# get socket address
+					for family, _, _, _, sockaddr in socket.getaddrinfo( self.__addr[0], self.__addr[1], 0, 0, socket.SOL_TCP ):
+						if family == self.__type:
+							self.__addr = sockaddr
+							break
+		
+					print "binding to " + str(self.__addr)					
+					self.__sock.bind( self.__addr )
+					self.__sock.listen(1)				
 				
 				print "waiting for connection"
 				while not self.__conn:
@@ -82,9 +82,10 @@ class NAOServer(object):
 				if self.__connectionHandshake():
 					return True
 						
-			except:
-				print "ERROR CONNECTING TO " + str(self.__addr)
-				traceback.print_tb( sys.exc_info()[2] )				
+			except socket.error as msg:
+				info = sys.exc_info()
+				print "ERROR CONNECTING TO " + str(self.__addr) + ":" + str(msg)
+				traceback.print_tb( info[2] )				
 				
 			return False
 		
@@ -95,7 +96,7 @@ class NAOServer(object):
 
 			if ret and len(ret) > 1:
 				data = eval(ret[0])	
-				if 'type' in data and dataTypes.CONNECT in data['type'] and 'command' in data and dataCommands.SYS_CONNECT in data['command']:
+				if 'command' in data and dataCommands.SYS_CONNECT in data['command']:
 					data = self.createDataResponsePackage(data, True)
 					self.send(data)
 					return True
@@ -115,14 +116,15 @@ class NAOServer(object):
 			'naoName': str( sysProxy.robotName() ),
 			'batteryLevel': int( batProxy.getBatteryCharge() ),
 			'stiffnessData': self.__createStiffnessDatapackage(),
-			'audioData': self.__createAudioDatapackage() }
+			'audioData': self.__createAudioDatapackage() }			
+			
 		return data
 	
-	def __createDataRequestPackage(self, aType, aCommand, aArguments=[] ):
+	def __createDataRequestPackage(self, aCommand, aArguments=[] ):
 		'''
 		Creates data request package
 		'''
-		return {'type': aType, 'command': aCommand, 'commandArguments': aArguments}
+		return {'command': aCommand, 'commandArguments': aArguments}
 	
 	def __createStiffnessDatapackage(self):
 		'''
@@ -144,7 +146,6 @@ class NAOServer(object):
 					
 			except:
 				print "ERROR: Unknown joint " + str(joint)
-			
 		return data
 	
 	def __createAudioDatapackage(self):
@@ -184,16 +185,11 @@ class NAOServer(object):
 		Reads from socket and return tuple of data (data, adress)
 		'''
 		if self.__sock and self.__conn:
-			try:				
-				data = self.__conn.recv(self.__framesize)
-				
-				# if first connect, say something
-				if not self.__init:
-					cmdChangelang().exe([None, "English"])
-					cmdSay().exe([None, "App connected", 100, 100])
-					self.__init = True
-				
+			try:		
+						
+				data = self.__conn.recv(self.__framesize)				
 				return (data, self.__remoteAddr)
+			
 			except:
 				pass
 				
@@ -222,16 +218,24 @@ class NAOServer(object):
 		close socket connection
 		'''
 		if self.__sock:
+			
 			try:
-				self.__sock.close()
-				self.__sock = None
-				self.__conn = None
-				self.__remoteAddr = None
-				self.__addr = ("", None)
-				if not restart and self.__connected:
-					cmdChangelang().exe([None, "English"])
-					cmdSay().exe([None, "Control server stopped.", 100, 100])
+				if self.__conn:
+					self.__conn.close()
+					self.__conn = None
+				
+				if not restart:
+					self.__sock.close()
+					self.__sock = None
+					self.__remoteAddr = None
+					self.__connected = False
+				
+				else:
+					print "restarting connection"
+					self.__initServer(True)
+				
 				return True
+			
 			except:
 				print "COULD NOT CLOSE SOCKET CONNECTION"
 		
