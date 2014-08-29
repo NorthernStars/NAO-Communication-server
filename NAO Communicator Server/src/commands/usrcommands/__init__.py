@@ -1,4 +1,11 @@
 __all__ = [
+           "cmdSetSystemVolume",
+           "cmdSetPlayerVolume",
+           "cmdSetJointStiffness",
+           
+           "cmdOpenHand",
+           "cmdSetLifeState",
+           
            "cmdInfo",
            "cmdHallo",
            "cmdSay",

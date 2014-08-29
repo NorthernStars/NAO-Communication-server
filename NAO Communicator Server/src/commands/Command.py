@@ -22,6 +22,13 @@ class NAOCommand(object):
 		'''
 		adds commands to a lst and returns that lst
 		'''		
+		NAOCommand.lst.append( cmdSetSystemVolume.cmdSetSystemVolume() )
+		NAOCommand.lst.append( cmdSetPlayerVolume.cmdSetPlayerVolume() )
+		NAOCommand.lst.append( cmdSetJointStiffness.cmdSetJointStiffness() )
+		
+		NAOCommand.lst.append( cmdOpenHand.cmdOpenHand() )
+		NAOCommand.lst.append( cmdSetLifeState.cmdSetLifeState() )			
+		
 		NAOCommand.lst.append( cmdInfo.cmdInfo() )
 		NAOCommand.lst.append( cmdSay.cmdSay() )
 		NAOCommand.lst.append( cmdHallo.cmdHallo() )
@@ -62,34 +69,13 @@ class NAOCommand(object):
 		'''
 		Resolves recieved data in form of [ command, [argument1, argument2, ...] ]
 		'''
-		# create array from data
-		data = str(data)
-		data = data.replace('[', '')
-		data = data.replace(']', '')
-		data = data.replace('\'', '')		
-		data = str(data).split(',')
-		
-		# remove whitespaces
-		for i in range( len(data) ):
-			data[i] = str(data[i]).strip()
-			
-		# check if command exsists
-		if len(data) == 0:
-			return False
-		
-		# check if to restart server connection
-		if data[0] == "dummyStop":
-			return "restart"
 		
 		# go through commands list ans search for command
-		ret = False
 		for cmd in NAOCommand.lst:
-			if str(cmd.cmd) == str(data[0]):
-				ret = True
-				start_new_thread( cmd.exe, (data, addr) )
+			if str(cmd.cmd) == data['command']:
+				start_new_thread( cmd.exe, (data['commandArguments'], addr) )
+				return True
 		
-		if not ret:
-			print "could find command", str(data[0])
-				
-		return ret
+		print "could not find command " + str(data)				
+		return False
 

@@ -95,7 +95,11 @@ class NAOServer(object):
 			ret = self.read()
 
 			if ret and len(ret) > 1:
-				data = eval(ret[0])	
+				try:
+					data = eval(ret[0])
+				except:
+					data = {}
+					
 				if 'command' in data and dataCommands.SYS_CONNECT in data['command']:
 					data = self.createDataResponsePackage(data, True)
 					self.send(data)
@@ -109,12 +113,14 @@ class NAOServer(object):
 		'''
 		sysProxy = ALProxy("ALSystem", Settings.naoHostName, Settings.naoPort)
 		batProxy = ALProxy("ALBattery", Settings.naoHostName, Settings.naoPort)
+		lifeProxy = ALProxy("ALAutonomousLife", Settings.naoHostName, Settings.naoPort)
 		
 		data = {
 			'request': request,
 			'requestSuccessfull': success,
 			'naoName': str( sysProxy.robotName() ),
 			'batteryLevel': int( batProxy.getBatteryCharge() ),
+			'lifeState': lifeProxy.getState(),
 			'stiffnessData': self.__createStiffnessDatapackage(),
 			'audioData': self.__createAudioDatapackage() }			
 			
@@ -141,22 +147,26 @@ class NAOServer(object):
 						stiffness += stiff
 				
 				stiffness = stiffness / len(stiffnessList)
-				data['jointStiffness'][ dataJoints.JOINTS[joint] ] = stiffness
-						
+				data['jointStiffness'][ dataJoints.JOINTS[joint] ] = stiffness						
 					
 			except:
 				print "ERROR: Unknown joint " + str(joint)
+		data['leftHandOpen'] = motionProxy.getAngles("LHand", True)[0] > 0.3
+		data['rightHandOpen'] = motionProxy.getAngles("RHand", True)[0] > 0.3
+		
 		return data
 	
 	def __createAudioDatapackage(self):
 		'''
 		Creates audio data package
 		'''
+		audioProxy = ALProxy("ALAudioDevice", Settings.naoHostName, Settings.naoPort)
 		ttsProxy = ALProxy("ALTextToSpeech", Settings.naoHostName, Settings.naoPort)
 		playerProxy = ALProxy("ALAudioPlayer", Settings.naoHostName, Settings.naoPort)
 		
 		data = {
-			'masterVolume': playerProxy.getMasterVolume(),
+			'masterVolume': audioProxy.getOutputVolume(),
+			'playerVolume': playerProxy.getMasterVolume(),
 			'speechVolume': ttsProxy.getVolume(),
 			'speechVoice': ttsProxy.getVoice(),
 			'speechLanguage': ttsProxy.getLanguage(),
