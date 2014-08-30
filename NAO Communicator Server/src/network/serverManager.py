@@ -94,7 +94,7 @@ class ServerManager(object):
                     data = line.split(": ")
                     if len(data) > 1:
                         data = data[1].split(" ")[0].split("/")
-                        return data[0]
+                        return  str(data[0]) + "%" + str(interface)
         
         return None
     
