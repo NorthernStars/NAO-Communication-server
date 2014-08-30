@@ -12,7 +12,7 @@ class cmdSay(object):
 	'''
 	
 	def __init__(self):
-		self.cmd = "say"
+		self.cmd = "SAY"
 	
 	def exe(self, args=None, addr=None):
 		
@@ -23,11 +23,12 @@ class cmdSay(object):
 		# create proxy
 		tts = ALProxy('ALTextToSpeech', Settings.naoHostName, Settings.naoPort)
 		
-		# create sentence	
-		sentence = "\RSPD="+ str( args[2] ) + "\ "
-		sentence += "\VCT="+ str( args[3] ) + "\ "
-		sentence += str( args[1])
-		sentence +=  "\RST\ "
-		
-		# say sentence
-		tts.post.say( str(sentence) )
+		# create sentence
+		if len(args) > 2:	
+			sentence = "\RSPD="+ str( args[1] ) + "\ "
+			sentence += "\VCT="+ str( args[2] ) + "\ "
+			sentence += str( args[0])
+			sentence +=  "\RST\ "
+			
+			# say sentence
+			tts.post.say( str(sentence) )

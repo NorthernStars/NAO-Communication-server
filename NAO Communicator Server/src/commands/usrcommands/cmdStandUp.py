@@ -13,7 +13,7 @@ class cmdStandUp(object):
 
 
     def __init__(self):
-        self.cmd = "standUp"
+        self.cmd = "STAND_UP"
     
     def exe(self, args=None, addr=None):
         

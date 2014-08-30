@@ -13,7 +13,7 @@ class cmdSitDown(object):
 
 
     def __init__(self):
-        self.cmd = "sitDown"
+        self.cmd = "SIT_DOWN"
     
     def exe(self, args=None, addr=None):
         
