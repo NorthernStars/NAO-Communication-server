@@ -10,6 +10,10 @@ import sys
 import traceback
 from naoqi import ALProxy
 from settings.Settings import Settings
+from time import time
+from threading import Lock
+from time import sleep
+from thread import start_new_thread
 
 class NAOServer(object):
 	'''
@@ -23,6 +27,24 @@ class NAOServer(object):
 	__remoteAddr = None
 	__type = socket.AF_INET
 	__connected = False
+	
+	__sysProxy = None
+	__batProxy = None
+	__lifeProxy = None
+	__motionProxy = None
+	__audioProxy = None
+	__ttsProxy = None
+	__playerProxy = None
+	
+	__robotName = "Nao"
+	__speechLanguagesList = []
+	__speechVoicesList = []
+	
+	__stiffnessData = {}
+	__audioData = {}
+	
+	__stiffnessDataLock = None
+	__audioDataLock = None
 
 
 	def __init__(self, host=Settings.serverDefaultIP, port=Settings.serverDefaultPort, framesize=1024):
@@ -42,6 +64,24 @@ class NAOServer(object):
 		except:
 			self.__addr = (Settings.serverDefaultIP, port)
 			
+		self.__sysProxy = ALProxy("ALSystem", Settings.naoHostName, Settings.naoPort)
+		self.__batProxy = ALProxy("ALBattery", Settings.naoHostName, Settings.naoPort)
+		self.__lifeProxy = ALProxy("ALAutonomousLife", Settings.naoHostName, Settings.naoPort)
+		self.__motionProxy = ALProxy("ALMotion", Settings.naoHostName, Settings.naoPort)
+		self.__audioProxy = ALProxy("ALAudioDevice", Settings.naoHostName, Settings.naoPort)
+		self.__ttsProxy = ALProxy("ALTextToSpeech", Settings.naoHostName, Settings.naoPort)
+		self.__playerProxy = ALProxy("ALAudioPlayer", Settings.naoHostName, Settings.naoPort)
+		
+		self.__robotName = self.__sysProxy.robotName()
+		self.__speechLanguagesList = self.__ttsProxy.getAvailableLanguages()
+		self.__speechVoicesList = self.__ttsProxy.getAvailableVoices()
+				
+		self.__stiffnessData = {}
+		self.__audioData = {}
+		
+		self.__stiffnessDataLock = Lock()
+		self.__audioDataLock = Lock()
+			
 		self.__framesize = framesize
 		self.__sock = socket.socket(self.__type, socket.SOCK_STREAM)
 		self.__sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -54,6 +94,7 @@ class NAOServer(object):
 		'''	
 		self.__connected = False	
 		#self.__sock.settimeout(2.0)
+		start_new_thread(self.__datapackageCreationTask, ())
 		self.__connected = self.__connect(reconnect)	
 		
 	def __connect(self, reconnect=False):
@@ -111,19 +152,22 @@ class NAOServer(object):
 		'''
 		Creates data response package
 		'''
-		sysProxy = ALProxy("ALSystem", Settings.naoHostName, Settings.naoPort)
-		batProxy = ALProxy("ALBattery", Settings.naoHostName, Settings.naoPort)
-		lifeProxy = ALProxy("ALAutonomousLife", Settings.naoHostName, Settings.naoPort)
+		
+		self.__audioDataLock.acquire()
+		self.__stiffnessDataLock.acquire()
 		
 		data = {
 			'request': request,
 			'requestSuccessfull': success,
-			'naoName': str( sysProxy.robotName() ),
-			'batteryLevel': int( batProxy.getBatteryCharge() ),
-			'lifeState': lifeProxy.getState(),
-			'stiffnessData': self.__createStiffnessDatapackage(),
-			'audioData': self.__createAudioDatapackage() }			
-			
+			'naoName': self.__robotName,
+			'batteryLevel': int( self.__batProxy.getBatteryCharge() ),
+			'lifeState': self.__lifeProxy.getState(),
+			'stiffnessData': self.__stiffnessData,
+			'audioData': self.__audioData }
+		
+		self.__audioDataLock.release()
+		self.__stiffnessDataLock.release()
+				
 		return data
 	
 	def __createDataRequestPackage(self, aCommand, aArguments=[] ):
@@ -132,15 +176,33 @@ class NAOServer(object):
 		'''
 		return {'command': aCommand, 'commandArguments': aArguments}
 	
+	def __datapackageCreationTask(self):
+		'''
+		Background task to create stiffness and audio datapackage
+		'''
+		while not self.__conn:
+			pass
+		
+		while self.__conn:
+			self.__audioDataLock.acquire()
+			self.__audioData = self.__createAudioDatapackage()
+			self.__audioDataLock.release()
+			
+			self.__stiffnessDataLock.acquire()
+			self.__stiffnessData = self.__createStiffnessDatapackage()
+			self.__stiffnessDataLock.release()
+			
+			sleep(0.1)
+	
 	def __createStiffnessDatapackage(self):
 		'''
 		Creates stiffness data package
 		'''
-		motionProxy = ALProxy("ALMotion", Settings.naoHostName, Settings.naoPort)
+		
 		data = {'jointStiffness': {}}
 		for joint in dataJoints.JOINTS:
 			try:
-				stiffnessList = motionProxy.getStiffnesses( dataJoints.JOINTS[joint] )
+				stiffnessList = self.__motionProxy.getStiffnesses( dataJoints.JOINTS[joint] )
 				stiffness = 0.0
 				for stiff in stiffnessList:
 					if stiff > 0.0:
@@ -151,31 +213,27 @@ class NAOServer(object):
 					
 			except:
 				print "ERROR: Unknown joint " + str(joint)
-		data['leftHandOpen'] = motionProxy.getAngles("LHand", True)[0] > 0.3
-		data['rightHandOpen'] = motionProxy.getAngles("RHand", True)[0] > 0.3
-		
+		data['leftHandOpen'] = self.__motionProxy.getAngles("LHand", True)[0] > 0.3
+		data['rightHandOpen'] = self.__motionProxy.getAngles("RHand", True)[0] > 0.3
 		return data
 	
 	def __createAudioDatapackage(self):
 		'''
 		Creates audio data package
 		'''
-		audioProxy = ALProxy("ALAudioDevice", Settings.naoHostName, Settings.naoPort)
-		ttsProxy = ALProxy("ALTextToSpeech", Settings.naoHostName, Settings.naoPort)
-		playerProxy = ALProxy("ALAudioPlayer", Settings.naoHostName, Settings.naoPort)
-		
+			
 		data = {
-			'masterVolume': audioProxy.getOutputVolume(),
-			'playerVolume': playerProxy.getMasterVolume(),
-			'speechVolume': ttsProxy.getVolume(),
-			'speechVoice': ttsProxy.getVoice(),
-			'speechLanguage': ttsProxy.getLanguage(),
-			'speechLanguagesList': ttsProxy.getAvailableLanguages(),
-			'speechVoicesList': ttsProxy.getAvailableVoices(),
-			'speechPitchShift': ttsProxy.getParameter("pitchShift"),
-			'speechDoubleVoice': ttsProxy.getParameter("doubleVoice"),
-			'speechDoubleVoiceLevel': ttsProxy.getParameter("doubleVoiceLevel"),
-			'speechDoubleVoiceTimeShift': ttsProxy.getParameter("doubleVoiceTimeShift")
+			'masterVolume': self.__audioProxy.getOutputVolume(),
+			'playerVolume': self.__playerProxy.getMasterVolume(),
+			'speechVolume': self.__ttsProxy.getVolume(),
+			'speechVoice': self.__ttsProxy.getVoice(),
+			'speechLanguage': self.__ttsProxy.getLanguage(),
+			'speechLanguagesList': self.__speechLanguagesList,
+			'speechVoicesList': self.__speechVoicesList,
+			'speechPitchShift': self.__ttsProxy.getParameter("pitchShift"),
+			'speechDoubleVoice': self.__ttsProxy.getParameter("doubleVoice"),
+			'speechDoubleVoiceLevel': self.__ttsProxy.getParameter("doubleVoiceLevel"),
+			'speechDoubleVoiceTimeShift': self.__ttsProxy.getParameter("doubleVoiceTimeShift")
 			}
 		return data
 		

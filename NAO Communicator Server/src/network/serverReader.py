@@ -93,7 +93,7 @@ class ServerReader(object):
                     
                 # handle user
                 else:
-                    ret = NAOCommand.resolveCmd( data, addr )
+                    ret = NAOCommand.resolveCmd( data, addr )                  
                     data = self.server.createDataResponsePackage(data, ret)
                     disconnect = not self.server.send(data)
                     
