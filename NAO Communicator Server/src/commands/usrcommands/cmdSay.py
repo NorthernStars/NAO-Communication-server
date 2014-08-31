@@ -16,10 +16,6 @@ class cmdSay(object):
 	
 	def exe(self, args=None, addr=None):
 		
-		# check arguments
-		if len(args) != 4:
-			return False
-		
 		# create proxy
 		tts = ALProxy('ALTextToSpeech', Settings.naoHostName, Settings.naoPort)
 		
@@ -31,4 +27,10 @@ class cmdSay(object):
 			sentence +=  "\RST\ "
 			
 			# say sentence
+			print "say1"
 			tts.post.say( str(sentence) )
+			
+		elif len(args) > 0:
+			# say sentence
+			print "say2", str(args[0]).strip()
+			tts.post.say( str(args[0]).strip() )
