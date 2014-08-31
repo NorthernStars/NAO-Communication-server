@@ -27,10 +27,8 @@ class cmdSay(object):
 			sentence +=  "\RST\ "
 			
 			# say sentence
-			print "say1"
 			tts.post.say( str(sentence) )
 			
 		elif len(args) > 0:
 			# say sentence
-			print "say2", str(args[0]).strip()
 			tts.post.say( str(args[0]).strip() )
