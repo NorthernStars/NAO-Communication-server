@@ -18,32 +18,33 @@ class ServerReader(object):
         Constructor
         '''
         self.host = host
-        self.run = True
-        self.restarted = False
-        self.server = None
+        self.__run = True
+        self.__resetTimer = 0.0
+        self.__restarted = False
+        self.__server = None
     
     def exe(self): 
-        # create & connect server      
-        while self.run:        
+        # create & connect __server      
+        while self.__run:        
             
-            self.server = False
-            self.server = NAOServer( self.host )
+            self.__server = False
+            self.__server = NAOServer( self.host )
             
-            if not self.server.isConnected():
+            if not self.__server.isConnected():
                 self.close()
             
-            self.restarted = True
+            self.__restarted = True
             
             # recieve data
-            while self.server.active() and self.run:
+            while self.__server.active() and self.__run:
                 
-                ret = self.server.read()
+                ret = self.__server.read()
                 if ret:
                     data, addr = ret
                     print "recieved data = " + str(data)
                     
                     if len( str(data) ) < 1:                        
-                        self.server.close(True)
+                        self.__server.close(True)
                     else:                    
                         try:
                             
@@ -68,7 +69,9 @@ class ServerReader(object):
                                     d = eval( str(d) )
                                     self.__handleData(d, addr)
                                 except:
-                                    self.server.close(True)                
+                                    self.__server.close(True)  
+                else:
+                    print "no data"              
                             
                                        
     def __handleData(self, data, addr):
@@ -83,37 +86,35 @@ class ServerReader(object):
                 
                 # handle build in commands
                 if data['command'] == dataCommands.SYS_DISCONNECT:
-                    data = self.server.createDataResponsePackage(data, True)
-                    self.server.send(data);
+                    data = self.__server.createDataResponsePackage(data, True)
+                    self.__server.send(data);
                     disconnect = True
                     
                 elif data['command'] == dataCommands.SYS_GET_INFO:
-                    data = self.server.createDataResponsePackage(data, True)
-                    disconnect = not self.server.send(data)
+                    data = self.__server.createDataResponsePackage(data, True)
+                    disconnect = not self.__server.send(data)
                     
                 # handle user
                 else:
                     ret = NAOCommand.resolveCmd( data, addr )                  
-                    data = self.server.createDataResponsePackage(data, ret)
-                    disconnect = not self.server.send(data)
+                    data = self.__server.createDataResponsePackage(data, ret)
+                    disconnect = not self.__server.send(data)
                     
             # handle protocol error
             else:
-                data = self.server.createDataResponsePackage(data, False)
-                disconnect = not self.server.send(data)    
+                data = self.__server.createDataResponsePackage(data, False)
+                disconnect = not self.__server.send(data)    
             
             
             # check if command was successfully executed
             if disconnect:
-                self.server.close(True)             
+                self.__server.close(True)        
     
-        
-                        
     
     '''
-    Closes server reader
+    Closes __server reader
     '''    
     def close(self):
-        self.run = False
-        self.server.close()
-        print "closed server on", self.host
+        self.__run = False
+        self.__server.close()
+        print "closed __server on", self.host

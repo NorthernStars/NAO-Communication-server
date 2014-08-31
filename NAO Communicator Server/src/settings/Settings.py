@@ -14,3 +14,4 @@ class Settings(object):
     serverDefaultIP = "127.0.0.1"
     serverDefaultPort = 5050
     serverServiceType = "_naocom._tcp"
+    infoReplayDelay = 2.0

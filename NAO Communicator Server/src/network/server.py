@@ -45,6 +45,8 @@ class NAOServer(object):
 	
 	__stiffnessDataLock = None
 	__audioDataLock = None
+	
+	__lastSend = 0.0
 
 
 	def __init__(self, host=Settings.serverDefaultIP, port=Settings.serverDefaultPort, framesize=1024):
@@ -81,6 +83,8 @@ class NAOServer(object):
 		
 		self.__stiffnessDataLock = Lock()
 		self.__audioDataLock = Lock()
+		
+		self.__lastSend = 0.0
 			
 		self.__framesize = framesize
 		self.__sock = socket.socket(self.__type, socket.SOCK_STREAM)
@@ -93,9 +97,9 @@ class NAOServer(object):
 		Initiates the server
 		'''	
 		self.__connected = False	
-		#self.__sock.settimeout(2.0)
 		start_new_thread(self.__datapackageCreationTask, ())
-		self.__connected = self.__connect(reconnect)	
+		self.__sock.settimeout(None)
+		self.__connected = self.__connect(reconnect)
 		
 	def __connect(self, reconnect=False):
 		'''
@@ -176,6 +180,7 @@ class NAOServer(object):
 		'''
 		return {'command': aCommand, 'commandArguments': aArguments}
 	
+	
 	def __datapackageCreationTask(self):
 		'''
 		Background task to create stiffness and audio datapackage
@@ -193,6 +198,13 @@ class NAOServer(object):
 			self.__stiffnessDataLock.release()
 			
 			sleep(0.1)
+			
+			# check if to send info package
+			if( time() - self.__lastSend > Settings.infoReplayDelay ):
+				request = self.__createDataRequestPackage( dataCommands.SYS_GET_INFO, [] )
+				data = self.createDataResponsePackage(request, True)
+				self.send(data)
+								
 	
 	def __createStiffnessDatapackage(self):
 		'''
@@ -271,6 +283,7 @@ class NAOServer(object):
 		if self.__sock and self.__conn:
 			try:				
 				self.__conn.send( str(data) + "\n" )
+				self.__lastSend = time()
 				return True
 			except:
 				pass
