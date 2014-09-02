@@ -201,8 +201,8 @@ class NAOServer(object):
 			
 			# check if to send info package
 			if( time() - self.__lastSend > Settings.infoReplayDelay ):
-				request = self.__createDataRequestPackage( dataCommands.SYS_GET_INFO, [] )
-				data = self.createDataResponsePackage(request, True)
+				request = self.__createDataRequestPackage( dataCommands.SYS_SEND_INFO, [] )
+				data = self.createDataResponsePackage(request, False)
 				self.send(data)
 								
 	
