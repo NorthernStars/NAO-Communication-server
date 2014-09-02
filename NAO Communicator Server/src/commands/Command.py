@@ -24,6 +24,7 @@ class NAOCommand(object):
 		'''		
 		NAOCommand.lst.append( cmdSetSystemVolume.cmdSetSystemVolume() )
 		NAOCommand.lst.append( cmdSetPlayerVolume.cmdSetPlayerVolume() )
+		NAOCommand.lst.append( cmdSetSpeechVolume.cmdSetSpeechVolume() )
 		NAOCommand.lst.append( cmdSetJointStiffness.cmdSetJointStiffness() )
 		
 		NAOCommand.lst.append( cmdOpenHand.cmdOpenHand() )
@@ -34,8 +35,6 @@ class NAOCommand(object):
 		NAOCommand.lst.append( cmdStandUp.cmdStandUp() )
 		NAOCommand.lst.append( cmdSitDown.cmdSitDown() )
 		NAOCommand.lst.append( cmdVelocityWalk.cmdVelocityWalk() )
-		NAOCommand.lst.append( cmdChangeLang.cmdChangelang() )
-		NAOCommand.lst.append( cmdSetVolume.cmdSetVolume() )
 		
 		NAOCommand.lst.append( ledAngry.ledAngry() )
 		NAOCommand.lst.append( ledBlink.ledBlink() )

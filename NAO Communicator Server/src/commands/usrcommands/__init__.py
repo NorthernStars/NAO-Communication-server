@@ -1,6 +1,7 @@
 __all__ = [
            "cmdSetSystemVolume",
            "cmdSetPlayerVolume",
+           "cmdSetSpeechVolume",
            "cmdSetJointStiffness",
            
            "cmdOpenHand",
@@ -12,7 +13,6 @@ __all__ = [
            "cmdStandUp",
            "cmdVelocityWalk",
            "cmdChangeLang",
-           "cmdSetVolume",
            "ledAngry",
            "ledBlink",
            "ledCautious",
