@@ -25,6 +25,9 @@ class NAOCommand(object):
 		NAOCommand.lst.append( cmdSetSystemVolume.cmdSetSystemVolume() )
 		NAOCommand.lst.append( cmdSetPlayerVolume.cmdSetPlayerVolume() )
 		NAOCommand.lst.append( cmdSetSpeechVolume.cmdSetSpeechVolume() )
+		NAOCommand.lst.append( cmdSetSpeechLanguage.cmdSetSpeechLanguage() )
+		NAOCommand.lst.append( cmdSetSpeechVoice.cmdSetSpeechVoice() )
+		
 		NAOCommand.lst.append( cmdSetJointStiffness.cmdSetJointStiffness() )
 		
 		NAOCommand.lst.append( cmdOpenHand.cmdOpenHand() )

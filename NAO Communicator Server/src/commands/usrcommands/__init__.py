@@ -2,6 +2,9 @@ __all__ = [
            "cmdSetSystemVolume",
            "cmdSetPlayerVolume",
            "cmdSetSpeechVolume",
+           "cmdSetSpeechLanguage",
+           "cmdSetSpeechVoice",
+           
            "cmdSetJointStiffness",
            
            "cmdOpenHand",
