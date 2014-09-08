@@ -29,6 +29,7 @@ class NAOCommand(object):
 		NAOCommand.lst.append( cmdSetSpeechVoice.cmdSetSpeechVoice() )
 		
 		NAOCommand.lst.append( cmdSetJointStiffness.cmdSetJointStiffness() )
+		NAOCommand.lst.append( cmdMemoryEventRaise.cmdMemoryEventRaise() )
 		
 		NAOCommand.lst.append( cmdOpenHand.cmdOpenHand() )
 		NAOCommand.lst.append( cmdSetLifeState.cmdSetLifeState() )

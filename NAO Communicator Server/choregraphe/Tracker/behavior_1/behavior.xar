@@ -1,0 +1,524 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ChoregrapheProject xmlns="http://www.aldebaran-robotics.com/schema/choregraphe/project.xsd" xar_version="3">
+    <Box name="root" id="-1" localization="8" tooltip="Root box of Choregraphe&apos;s behavior. Highest level possible." x="0" y="0">
+        <bitmap>media/images/box/root.png</bitmap>
+        <script language="4">
+            <content>
+                <![CDATA[]]>
+</content>
+        </script>
+        <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+        <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+        <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+        <Input name="functionRedBallTracker" type="0" type_size="1" nature="4" stm_value_name="functionRedBallTracker" inner="1" tooltip="functionRedBallTracker desc" id="4" />
+        <Input name="functionFaceTracker" type="0" type_size="1" nature="4" stm_value_name="functionFaceTracker" inner="1" tooltip="functionFaceTracker desc" id="5" />
+        <Input name="nacomAbort" type="0" type_size="1" nature="4" stm_value_name="nacomAbort" inner="1" tooltip="nacomAbort desc" id="6" />
+        <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="7" />
+        <Timeline enable="0">
+            <BehaviorLayer name="behavior_layer1">
+                <BehaviorKeyframe name="keyframe1" index="1">
+                    <Diagram>
+                        <Box name="OnOff" id="9" localization="8" tooltip="Enter tooltip here" x="230" y="161">
+                            <bitmap>media/images/box/box-diagram.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+        self._on = False
+        pass
+
+    def onLoad(self):
+        #~ puts code for box initialization here
+        pass
+
+    def onUnload(self):
+        #~ puts code for box cleanup here
+        pass
+
+    def onInput_onStart(self):
+        if self._on:
+            self._on = False
+            self.off()
+        else:
+            self._on = True
+            self.on()
+        #~ self.onStopped() #~ activate output of the box
+        pass
+
+    def onInput_onStop(self):
+        self._on = False
+        self.off()
+        self.onUnload() #~ it is recommended to call onUnload of this box in a onStop method, as the code written in onUnload is used to stop the box as well
+        pass]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                            <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+                            <Output name="on" type="1" type_size="1" nature="2" inner="0" tooltip="" id="5" />
+                            <Output name="off" type="1" type_size="1" nature="2" inner="0" tooltip="" id="6" />
+                        </Box>
+                        <Box name="OnOff (1)" id="10" localization="8" tooltip="Enter tooltip here" x="217" y="296">
+                            <bitmap>media/images/box/box-diagram.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+        self._on = False
+        pass
+
+    def onLoad(self):
+        #~ puts code for box initialization here
+        pass
+
+    def onUnload(self):
+        #~ puts code for box cleanup here
+        pass
+
+    def onInput_onStart(self):
+        if self._on:
+            self._on = False
+            self.off()
+        else:
+            self._on = True
+            self.on()
+        #~ self.onStopped() #~ activate output of the box
+        pass
+
+    def onInput_onStop(self):
+        self._on = False
+        self.off()
+        self.onUnload() #~ it is recommended to call onUnload of this box in a onStop method, as the code written in onUnload is used to stop the box as well
+        pass]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                            <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+                            <Output name="on" type="1" type_size="1" nature="2" inner="0" tooltip="" id="5" />
+                            <Output name="off" type="1" type_size="1" nature="2" inner="0" tooltip="" id="6" />
+                        </Box>
+                        <Box name="Red Ball Tracker" id="1" localization="-1" tooltip="This box makes the robot track a red ball with different modes." x="403" y="159">
+                            <bitmap>media/images/box/tracker/tracker.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[import time
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+        self.tracker = ALProxy( "ALTracker" )
+        self.memory = ALProxy("ALMemory")
+        self.targetName = "RedBall"
+        self.distanceX = 0.0
+        self.distanceY = 0.0
+        self.angleWz = 0.0
+        self.thresholdX = 0.0
+        self.thresholdY = 0.0
+        self.thresholdWz = 0.0
+        self.subscribeDone = None
+        self.effector = "None"
+        self.isRunning = False
+
+    def onLoad(self):
+        self.BIND_PYTHON(self.getName(), "setParameter")
+        self.BIND_PYTHON(self.getName(), "onTargetLost")
+        self.BIND_PYTHON(self.getName(), "onTargetReached")
+        self.BIND_PYTHON(self.getName(), "onTargetChanged")
+        self.memory.subscribeToEvent("ALTracker/ActiveTargetChanged", self.getName(), "onTargetChanged")
+
+    def onUnload(self):
+        if self.subscribeDone:
+            self.memory.unsubscribeToEvent("ALTracker/TargetLost", self.getName())
+            self.memory.unsubscribeToEvent("ALTracker/TargetReached", self.getName())
+            self.subscribeDone = False
+
+        if self.isRunning:
+            self.tracker.setEffector("None")
+            self.tracker.stopTracker()
+            self.tracker.unregisterTarget(self.targetName)
+            self.isRunning = False
+
+    def onInput_onStart(self):
+        self.memory.subscribeToEvent("ALTracker/TargetLost", self.getName(), "onTargetLost")
+        self.memory.subscribeToEvent("ALTracker/TargetReached", self.getName(), "onTargetReached")
+        self.subscribeDone = True
+
+        mode = self.getParameter("Mode")
+        diameter = self.getParameter("Diameter (m)")
+        self.distanceX = self.getParameter("Distance X (m)")
+        self.thresholdX = self.getParameter("Threshold X (m)")
+        self.distanceY = self.getParameter("Distance Y (m)")
+        self.thresholdY = self.getParameter("Threshold Y (m)")
+        self.angleWz = self.getParameter("Theta (rad)")
+        self.thresholdWz = self.getParameter("Threshold Theta (rad)")
+        self.effector = self.getParameter("Effector")
+
+        self.tracker.setEffector(self.effector)
+
+        self.tracker.registerTarget(self.targetName, diameter)
+        self.tracker.setRelativePosition([-self.distanceX, self.distanceY, self.angleWz,
+                                           self.thresholdX, self.thresholdY, self.thresholdWz])
+        self.tracker.setMode(mode)
+
+        self.tracker.track(self.targetName) #Start tracker for red ball
+        self.isRunning = True
+
+    def onInput_onStop(self):
+        self.onStopped()
+        self.onUnload()
+
+    def setParameter(self, parameterName, newValue):
+        GeneratedClass.setParameter(self, parameterName, newValue)
+        if (parameterName == 'Mode'):
+            self.tracker.setMode(newValue)
+            return
+
+        if (parameterName == "Diameter (m)"):
+            self.tracker.registerTarget(self.targetName, newValue)
+            return
+
+        if (parameterName == "Distance X (m)"):
+            self.distanceX = newValue
+            self.tracker.setRelativePosition([-self.distanceX, self.distanceY, self.angleWz,
+                                               self.thresholdX, self.thresholdY, self.thresholdWz])
+            return
+
+        if (parameterName == "Distance Y (m)"):
+            self.distanceY = newValue
+            self.tracker.setRelativePosition([-self.distanceX, self.distanceY, self.angleWz,
+                                               self.thresholdX, self.thresholdY, self.thresholdWz])
+            return
+
+        if (parameterName == "Theta (rad)"):
+            self.angleWz = newValue
+            self.tracker.setRelativePosition([-self.distanceX, self.distanceY, self.angleWz,
+                                               self.thresholdX, self.thresholdY, self.thresholdWz])
+            return
+
+        if (parameterName == "Threshold X (m)"):
+            self.thresholdX = newValue
+            self.tracker.setRelativePosition([-self.distanceX, self.distanceY, self.angleWz,
+                                               self.thresholdX, self.thresholdY, self.thresholdWz])
+            return
+
+        if (parameterName == "Threshold Y (m)"):
+            self.thresholdY = newValue
+            self.tracker.setRelativePosition([-self.distanceX, self.distanceY, self.angleWz,
+                                               self.thresholdX, self.thresholdY, self.thresholdWz])
+            return
+
+        if (parameterName == "Threshold Theta (rad)"):
+            self.thresholdWz = newValue
+            self.tracker.setRelativePosition([-self.distanceX, self.distanceY, self.angleWz,
+                                               self.thresholdX, self.thresholdY, self.thresholdWz])
+            return
+
+        if(parameterName == "Effector"):
+            self.tracker.setEffector(newValue)
+            self.effector = newValue
+            return
+
+    def onTargetLost(self, key, value, message):
+        self.targetLost()
+
+    def onTargetReached(self, key, value, message):
+        self.targetReached()
+
+    def onTargetChanged(self, key, value, message):
+        if value == self.targetName and not self.subscribeDone:
+            self.memory.subscribeToEvent("ALTracker/TargetLost", self.getName(), "onTargetLost")
+            self.memory.subscribeToEvent("ALTracker/TargetReached", self.getName(), "onTargetReached")
+            self.subscribeDone = True
+        elif value != self.targetName and self.subscribeDone:
+            self.memory.unsubscribeToEvent("ALTracker/TargetLost", self.getName())
+            self.memory.unsubscribeToEvent("ALTracker/TargetReached", self.getName())
+            self.subscribeDone = False]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                            <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+                            <Output name="targetLost" type="1" type_size="1" nature="2" inner="0" tooltip="Signal sent when the target is lost." id="5" />
+                            <Output name="targetReached" type="1" type_size="1" nature="2" inner="0" tooltip="Signal sent when the target is reached." id="6" />
+                            <Parameter name="Mode" inherits_from_parent="0" content_type="3" value="WholeBody" default_value="Head" custom_choice="0" tooltip="Set tracker mode" id="7">
+                                <Choice value="Head" />
+                                <Choice value="WholeBody" />
+                                <Choice value="Move" />
+                            </Parameter>
+                            <Parameter name="Effector" inherits_from_parent="0" content_type="3" value="None" default_value="None" custom_choice="0" tooltip="Set effector to use for tracking. Head is always used." id="8">
+                                <Choice value="None" />
+                                <Choice value="Arms" />
+                                <Choice value="LArm" />
+                                <Choice value="RArm" />
+                            </Parameter>
+                            <Parameter name="Diameter (m)" inherits_from_parent="0" content_type="2" value="0.06" default_value="0.06" min="0.01" max="1" tooltip="Diameter of the ball in meters." id="9" />
+                            <Parameter name="Distance X (m)" inherits_from_parent="0" content_type="2" value="0.3" default_value="0.3" min="0.01" max="5" tooltip="Distance on X axis the robot will try to maintain from its target in move modes." id="10" />
+                            <Parameter name="Threshold X (m)" inherits_from_parent="0" content_type="2" value="0.1" default_value="0.1" min="0.01" max="1" tooltip="Threshold above which the robot will move to track its target in move modes." id="11" />
+                            <Parameter name="Distance Y (m)" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-5" max="5" tooltip="Distance on X axis the robot will try to maintain from its target in move modes." id="12" />
+                            <Parameter name="Threshold Y (m)" inherits_from_parent="0" content_type="2" value="0.1" default_value="0.1" min="0" max="1" tooltip="Threshold above which the robot will move to track its target in move modes." id="13" />
+                            <Parameter name="Theta (rad)" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-3.14" max="3.14" tooltip="Wz angle of the vector robot-target the robot will try to maintain in move modes." id="14" />
+                            <Parameter name="Threshold Theta (rad)" inherits_from_parent="0" content_type="2" value="0.3" default_value="0.3" min="0" max="3.14" tooltip="Threshold of the angle of the vector robot-target above which the robot will move to track its target in move modes." id="15" />
+                        </Box>
+                        <Box name="Face Tracker" id="4" localization="-1" tooltip="This box makes the robot track a face with different modes." x="408" y="299">
+                            <bitmap>media/images/box/interaction/target_face.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[import time
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+        self.tracker = ALProxy( "ALTracker" )
+        self.memory = ALProxy("ALMemory")
+        self.targetName = "Face"
+        self.distanceX = 0.0
+        self.distanceY = 0.0
+        self.angleWz = 0.0
+        self.thresholdX = 0.0
+        self.thresholdY = 0.0
+        self.thresholdWz = 0.0
+        self.subscribeDone = False
+        self.effector = "None"
+        self.isRunning = False
+
+    def onLoad(self):
+        self.BIND_PYTHON(self.getName(), "setParameter")
+        self.BIND_PYTHON(self.getName(), "onTargetLost")
+        self.BIND_PYTHON(self.getName(), "onTargetReached")
+        self.BIND_PYTHON(self.getName(), "onTargetChanged")
+        self.memory.subscribeToEvent("ALTracker/ActiveTargetChanged", self.getName(), "onTargetChanged")
+
+    def onUnload(self):
+        if self.subscribeDone:
+            self.memory.unsubscribeToEvent("ALTracker/TargetLost", self.getName())
+            self.memory.unsubscribeToEvent("ALTracker/TargetReached", self.getName())
+            self.subscribeDone = False
+
+        if self.isRunning:
+            self.tracker.setEffector("None")
+            self.tracker.stopTracker()
+            self.tracker.unregisterTarget(self.targetName)
+            self.isRunning = False
+
+    def onInput_onStart(self):
+        self.memory.subscribeToEvent("ALTracker/TargetLost", self.getName(), "onTargetLost")
+        self.memory.subscribeToEvent("ALTracker/TargetReached", self.getName(), "onTargetReached")
+        self.subscribeDone = True
+
+        mode = self.getParameter("Mode")
+        width = self.getParameter("Width (m)")
+        self.distanceX = self.getParameter("Distance X (m)")
+        self.thresholdX = self.getParameter("Threshold X (m)")
+        self.distanceY = self.getParameter("Distance Y (m)")
+        self.thresholdY = self.getParameter("Threshold Y (m)")
+        self.angleWz = self.getParameter("Theta (rad)")
+        self.thresholdWz = self.getParameter("Threshold Theta (rad)")
+        self.effector = self.getParameter("Effector")
+
+        self.tracker.setEffector(self.effector)
+
+        self.tracker.registerTarget(self.targetName, width)
+        self.tracker.setRelativePosition([-self.distanceX, self.distanceY, self.angleWz,
+                                           self.thresholdX, self.thresholdY, self.thresholdWz])
+        self.tracker.setMode(mode)
+
+        self.tracker.track(self.targetName) #Start tracker
+        self.isRunning = True
+
+    def onInput_onStop(self):
+        self.onStopped()
+        self.onUnload()
+
+    def setParameter(self, parameterName, newValue):
+        GeneratedClass.setParameter(self, parameterName, newValue)
+        if (parameterName == "Mode"):
+            self.tracker.setMode(newValue)
+            return
+
+        if (parameterName == "Width (m)"):
+            self.tracker.registerTarget(self.targetName, newValue)
+            return
+
+        if (parameterName == "Distance X (m)"):
+            self.distanceX = newValue
+            self.tracker.setRelativePosition([-self.distanceX, self.distanceY, self.angleWz,
+                                               self.thresholdX, self.thresholdY, self.thresholdWz])
+            return
+
+        if (parameterName == "Distance Y (m)"):
+            self.distanceY = newValue
+            self.tracker.setRelativePosition([-self.distanceX, self.distanceY, self.angleWz,
+                                               self.thresholdX, self.thresholdY, self.thresholdWz])
+            return
+
+        if (parameterName == "Theta (rad)"):
+            self.angleWz = newValue
+            self.tracker.setRelativePosition([-self.distanceX, self.distanceY, self.angleWz,
+                                               self.thresholdX, self.thresholdY, self.thresholdWz])
+            return
+
+        if (parameterName == "Threshold X (m)"):
+            self.thresholdX = newValue
+            self.tracker.setRelativePosition([-self.distanceX, self.distanceY, self.angleWz,
+                                               self.thresholdX, self.thresholdY, self.thresholdWz])
+            return
+
+        if (parameterName == "Threshold Y (m)"):
+            self.thresholdY = newValue
+            self.tracker.setRelativePosition([-self.distanceX, self.distanceY, self.angleWz,
+                                               self.thresholdX, self.thresholdY, self.thresholdWz])
+            return
+
+        if (parameterName == "Threshold Theta (rad)"):
+            self.thresholdWz = newValue
+            self.tracker.setRelativePosition([-self.distanceX, self.distanceY, self.angleWz,
+                                               self.thresholdX, self.thresholdY, self.thresholdWz])
+            return
+
+        if(parameterName == "Effector"):
+            self.tracker.setEffector(newValue)
+            self.effector = newValue
+            return
+
+    def onTargetLost(self, key, value, message):
+        self.targetLost()
+
+    def onTargetReached(self, key, value, message):
+        self.targetReached()
+
+    def onTargetChanged(self, key, value, message):
+        if value == self.targetName and not self.subscribeDone:
+            self.memory.subscribeToEvent("ALTracker/TargetLost", self.getName(), "onTargetLost")
+            self.memory.subscribeToEvent("ALTracker/TargetReached", self.getName(), "onTargetReached")
+            self.subscribeDone = True
+        elif value != self.targetName and self.subscribeDone:
+            self.memory.unsubscribeToEvent("ALTracker/TargetLost", self.getName())
+            self.memory.unsubscribeToEvent("ALTracker/TargetReached", self.getName())
+            self.subscribeDone = False]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                            <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+                            <Output name="targetLost" type="1" type_size="1" nature="2" inner="0" tooltip="Signal sent when the target is lost." id="5" />
+                            <Output name="targetReached" type="1" type_size="1" nature="2" inner="0" tooltip="Signal sent when the target is reached." id="6" />
+                            <Parameter name="Mode" inherits_from_parent="0" content_type="3" value="Head" default_value="Head" custom_choice="0" tooltip="Set tracker mode" id="7">
+                                <Choice value="Head" />
+                                <Choice value="WholeBody" />
+                                <Choice value="Move" />
+                            </Parameter>
+                            <Parameter name="Effector" inherits_from_parent="0" content_type="3" value="None" default_value="None" custom_choice="0" tooltip="Set effector to use for tracking. Head is always used." id="8">
+                                <Choice value="None" />
+                                <Choice value="Arms" />
+                                <Choice value="LArm" />
+                                <Choice value="RArm" />
+                            </Parameter>
+                            <Parameter name="Width (m)" inherits_from_parent="0" content_type="2" value="0.1" default_value="0.1" min="0.01" max="0.6" tooltip="Width of the face in meters" id="9" />
+                            <Parameter name="Distance X (m)" inherits_from_parent="0" content_type="2" value="0.3" default_value="0.3" min="0.01" max="5" tooltip="Distance on X axis the robot will try to maintain from its target in move modes." id="10" />
+                            <Parameter name="Threshold X (m)" inherits_from_parent="0" content_type="2" value="0.1" default_value="0.1" min="0.01" max="1" tooltip="Threshold above which the robot will move to track its target in move modes." id="11" />
+                            <Parameter name="Distance Y (m)" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-5" max="5" tooltip="Distance on Y axis the robot will try to maintain from its target in move modes." id="12" />
+                            <Parameter name="Threshold Y (m)" inherits_from_parent="0" content_type="2" value="0.1" default_value="0.1" min="0.01" max="1" tooltip="Threshold above which the robot will move to track its target in move modes." id="13" />
+                            <Parameter name="Theta (rad)" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-3.14" max="3.14" tooltip="Wz angle of the vector robot-target the robot will try to maintain in move modes." id="14" />
+                            <Parameter name="Threshold Theta (rad)" inherits_from_parent="0" content_type="2" value="0.3" default_value="0.3" min="0" max="3.14" tooltip="Threshold of the angle of the vector robot-target above which the robot will move to track its target in move modes." id="15" />
+                        </Box>
+                        <Box name="Stand Up" id="2" localization="8" tooltip="the robot tries to stand up from any position for a number of tries.&#x0A;&#x0A;Note: The number of tries can be set in parameters." x="576" y="158">
+                            <bitmap>media/images/box/movement/stand.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                            <Output name="success" type="1" type_size="1" nature="1" inner="0" tooltip="Stimulated when the robot succeed in standing up." id="4" />
+                            <Output name="failure" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when the robot failed to stand up after n tries.&#x0A;&#x0A;Note: The number of tries can be set in parameters." id="5" />
+                            <Parameter name="Maximum of tries" inherits_from_parent="0" content_type="1" value="3" default_value="3" min="0" max="10" tooltip="The maximum number of fails of stand up before stimulating the failure output." id="6" />
+                            <Timeline enable="0">
+                                <BehaviorLayer name="StandUpBehavior">
+                                    <BehaviorKeyframe name="DetectRobotPose" index="1">
+                                        <Diagram>
+                                            <Box name="Goto Posture" id="2" localization="8" tooltip="The robot goes from its current postition to the asked posture." x="331" y="92">
+                                                <bitmap>media/images/box/box-diagram.png</bitmap>
+                                                <script language="4">
+                                                    <content>
+                                                        <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.nTries = 0
+        self.postureProxy = ALProxy("ALRobotPosture")
+        pass
+
+    def onUnload(self):
+        self.postureProxy.stopMove()
+
+    def onInput_onStart(self):
+        if(self.nTries != self.getParameter("Maximum of tries")):
+            self.nTries = self.getParameter("Maximum of tries")
+            self.postureProxy.setMaxTryNumber(self.nTries)
+
+        result = self.postureProxy.goToPosture(self.getParameter("Name"), self.getParameter("Speed (%)")/100.)
+        if(result):
+            self.success()
+        else:
+            self.failure()
+        pass
+
+    def onInput_onStop(self):
+        self.onUnload() #~ it is recommanded to call onUnload of this box in a onStop method, as the code written in onUnload is used to stop the box as well
+        pass]]>
+</content>
+                                                </script>
+                                                <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                                                <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                                                <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                                                <Output name="success" type="1" type_size="1" nature="1" inner="0" tooltip="Stimulated if the posture has been reached." id="4" />
+                                                <Output name="failure" type="1" type_size="1" nature="1" inner="0" tooltip="Stimulated if the posture could not be reached." id="5" />
+                                                <Parameter name="Name" inherits_from_parent="0" content_type="3" value="Stand" default_value="Stand" custom_choice="1" tooltip="Name of the posture to go to." id="6">
+                                                    <Choice value="Crouch" />
+                                                    <Choice value="LyingBack" />
+                                                    <Choice value="LyingBelly" />
+                                                    <Choice value="Sit" />
+                                                    <Choice value="SitRelax" />
+                                                    <Choice value="StandInit" />
+                                                    <Choice value="Stand" />
+                                                    <Choice value="StandZero" />
+                                                </Parameter>
+                                                <Parameter name="Speed (%)" inherits_from_parent="0" content_type="1" value="80" default_value="80" min="0" max="100" tooltip="Speed to go to the posture." id="7" />
+                                                <Parameter name="Maximum of tries" inherits_from_parent="1" content_type="1" value="3" default_value="3" min="0" max="10" tooltip="The maximum number of fails of go to posture before stimulating the failure output." id="8" />
+                                                <Resource name="All motors" type="Lock" timeout="0" />
+                                                <Resource name="Stiffness" type="Lock" timeout="0" />
+                                            </Box>
+                                            <Link inputowner="2" indexofinput="2" outputowner="0" indexofoutput="2" />
+                                            <Link inputowner="0" indexofinput="4" outputowner="2" indexofoutput="4" />
+                                            <Link inputowner="0" indexofinput="5" outputowner="2" indexofoutput="5" />
+                                        </Diagram>
+                                    </BehaviorKeyframe>
+                                </BehaviorLayer>
+                            </Timeline>
+                            <Resource name="All motors" type="Lock" timeout="0" />
+                        </Box>
+                        <Link inputowner="9" indexofinput="2" outputowner="0" indexofoutput="4" />
+                        <Link inputowner="10" indexofinput="2" outputowner="0" indexofoutput="5" />
+                        <Link inputowner="1" indexofinput="2" outputowner="9" indexofoutput="5" />
+                        <Link inputowner="1" indexofinput="3" outputowner="9" indexofoutput="6" />
+                        <Link inputowner="4" indexofinput="2" outputowner="10" indexofoutput="5" />
+                        <Link inputowner="4" indexofinput="3" outputowner="10" indexofoutput="6" />
+                        <Link inputowner="9" indexofinput="3" outputowner="0" indexofoutput="6" />
+                        <Link inputowner="10" indexofinput="3" outputowner="0" indexofoutput="6" />
+                        <Link inputowner="2" indexofinput="2" outputowner="1" indexofoutput="4" />
+                    </Diagram>
+                </BehaviorKeyframe>
+            </BehaviorLayer>
+        </Timeline>
+    </Box>
+</ChoregrapheProject>

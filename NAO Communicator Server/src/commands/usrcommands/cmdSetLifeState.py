@@ -26,7 +26,8 @@ class cmdSetLifeState(object):
         # set life state
         if len(args) > 0:
             try:
-                life.setState( str(args[0]) )
+                if str(args[0]) not in life.getState():
+                    life.setState( str(args[0]) )
             except:
                 print "can not set life state " + str(args[0]) + ". Set disabled instead."
                 life.setState( 'disabled')
