@@ -18,7 +18,7 @@ class ledCautious(object):
         Constructor
         '''
         self.ALLeds = ALProxy("ALLeds", Settings.naoHostName, Settings.naoPort)
-        self.cmd = "ledCautious"
+        self.cmd = "LED_CAUTIOUS"
         self.running = False
         
     def exe(self, args=None, addr=None):

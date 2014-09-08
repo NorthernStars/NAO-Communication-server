@@ -18,7 +18,7 @@ class ledAngry(object):
         Constructor
         '''
         self.ALLeds = ALProxy("ALLeds", Settings.naoHostName, Settings.naoPort)
-        self.cmd = "ledAngry"
+        self.cmd = "LED_ANGRY"
         self.running = False
         
     def exe(self, args=None, addr=None):

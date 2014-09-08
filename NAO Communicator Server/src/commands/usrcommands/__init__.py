@@ -26,6 +26,7 @@ __all__ = [
            "ledLaugh",
            "ledMischievious",
            "ledThinking",
+           "ledSetEye",
            
            "cmdMemoryEventRaise"
            ]

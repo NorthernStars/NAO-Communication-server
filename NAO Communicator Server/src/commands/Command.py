@@ -50,6 +50,7 @@ class NAOCommand(object):
 		NAOCommand.lst.append( ledLaugh.ledLaugh() )
 		NAOCommand.lst.append( ledMischievious.ledMischievious() )
 		NAOCommand.lst.append( ledThinking.ledThinking() )
+		NAOCommand.lst.append( ledSetEye.ledSetEye() )
 
 
 	'''

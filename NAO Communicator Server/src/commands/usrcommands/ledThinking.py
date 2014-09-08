@@ -18,7 +18,7 @@ class ledThinking(object):
         Constructor
         '''
         self.ALLeds = ALProxy("ALLeds", Settings.naoHostName, Settings.naoPort)
-        self.cmd = "ledThinking"
+        self.cmd = "LED_THINKING"
         self.running = False
         
     def exe(self, args=None, addr=None):

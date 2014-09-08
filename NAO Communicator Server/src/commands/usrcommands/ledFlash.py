@@ -18,7 +18,7 @@ class ledFlash(object):
         Constructor
         '''
         self.ALLeds = ALProxy("ALLeds", Settings.naoHostName, Settings.naoPort)
-        self.cmd = "ledFlash"
+        self.cmd = "LED_FLASH"
         self.running = False
         
     def exe(self, args=None, addr=None):

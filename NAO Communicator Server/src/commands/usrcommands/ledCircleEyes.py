@@ -19,7 +19,7 @@ class ledCircleEyes(object):
         Constructor
         '''
         self.ALLeds = ALProxy("ALLeds", Settings.naoHostName, Settings.naoPort)
-        self.cmd = "ledCircleEyes"
+        self.cmd = "LED_CIRCLE_EYES"
         self.running = False
         
     def exe(self, args=None, addr=None):

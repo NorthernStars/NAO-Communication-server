@@ -18,7 +18,7 @@ class ledDisco(object):
         Constructor
         '''
         self.ALLeds = ALProxy("ALLeds", Settings.naoHostName, Settings.naoPort)
-        self.cmd = "ledDisco"
+        self.cmd = "LED_DISCO"
         self.running = False
         
     def exe(self, args=None, addr=None):
