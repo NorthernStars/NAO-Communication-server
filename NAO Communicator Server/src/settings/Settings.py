@@ -9,7 +9,7 @@ class Settings(object):
     Settings class
     '''
 
-    naoHostName = "192.168.0.103"
+    naoHostName = "127.0.0.1"
     naoPort = 9559
     serverDefaultIP = "127.0.0.1"
     serverDefaultPort = 5050

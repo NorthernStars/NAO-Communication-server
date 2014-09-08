@@ -11,14 +11,14 @@ from commands.Command import NAOCommand
 
 if __name__ == '__main__':
 	
-	# set current working padth
+	# set current working padth	
 	path = os.path.dirname(sys.argv[0])
 	if not path:
 		path = str(os.getcwd())
 		sys.argv[0] = path + "/" + str(sys.argv[0])
 		
-	print "set working path from " + str(os.getcwd()) + " to " + str(path) 
 	os.chdir(path)
+	print "set working path from " + str(os.getcwd()) + " to " + str(path) 
 	
 	# create commands list
 	NAOCommand.addCmds()
@@ -27,7 +27,7 @@ if __name__ == '__main__':
 	# Endlosschleife	
 	while(True):
 		servermanager.manage()
-		sleep(5)		
+		sleep(2)		
 	
 	print "ERROR: Program terminated"
 	

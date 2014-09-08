@@ -599,7 +599,6 @@
                         <Link inputowner="2" indexofinput="3" outputowner="0" indexofoutput="7" />
                         <Link inputowner="1" indexofinput="3" outputowner="0" indexofoutput="7" />
                         <Link inputowner="9" indexofinput="2" outputowner="0" indexofoutput="5" />
-                        <Link inputowner="9" indexofinput="3" outputowner="0" indexofoutput="7" />
                         <Link inputowner="3" indexofinput="2" outputowner="9" indexofoutput="5" />
                         <Link inputowner="4" indexofinput="2" outputowner="9" indexofoutput="6" />
                     </Diagram>
