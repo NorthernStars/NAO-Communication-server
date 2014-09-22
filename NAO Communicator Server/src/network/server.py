@@ -167,7 +167,7 @@ class NAOServer(object):
 			'requestSuccessfull': success,
 			'naoName': self.__robotName,
 			'batteryLevel': int( self.__batProxy.getBatteryCharge() ),
-			'lifeState': self.__lifeProxy.getState(),
+			'lifeState': self.__lifeProxy.getState() if "lifeState" in self.__requiredData else "disabled",
 			'stiffnessData': self.__stiffnessData,
 			'audioData': self.__audioData }
 		
