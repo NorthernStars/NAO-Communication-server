@@ -47,23 +47,23 @@ class ServerReader(object):
                         self.__server.close(True)
                     else:                    
                         try:
-                            
+                                
                             # try to interprete as one command
                             data = eval( data )
                             self.__handleData(data, addr)
                             
                         except:
-                            
+                             
                             # more commands in one string > split data
                             data = data.split("}{")
-                            
+                             
                             # check for beginng and ending brackets
                             for d in data:
                                 if not d.startswith("{"):
                                     d = "{" + d
                                 if not d.endswith("}"):
                                     d += "}"
-                                    
+                                     
                                 # handle command
                                 try:
                                     d = eval( str(d) )
@@ -94,9 +94,14 @@ class ServerReader(object):
                     data = self.__server.createDataResponsePackage(data, True)
                     disconnect = not self.__server.send(data)
                     
+                elif data['command'] == dataCommands.SYS_SET_REQUIRED_DATA:
+                    self.__server.setRequiredData( data['commandArguments'] )
+                    data = self.__server.createDataResponsePackage(data, True)
+                    disconnect = not self.__server.send(data)
+                    
                 # handle user
                 else:
-                    ret = NAOCommand.resolveCmd( data, addr )                  
+                    ret = NAOCommand.resolveCmd( data, self.__server )                  
                     data = self.__server.createDataResponsePackage(data, ret)
                     disconnect = not self.__server.send(data)
                     

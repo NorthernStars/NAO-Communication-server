@@ -45,6 +45,7 @@ class NAOServer(object):
 	
 	__stiffnessDataLock = None
 	__audioDataLock = None
+	__requiredData = []
 	
 	__lastSend = 0.0
 
@@ -83,6 +84,7 @@ class NAOServer(object):
 		
 		self.__stiffnessDataLock = Lock()
 		self.__audioDataLock = Lock()
+		self.__requiredData = []
 		
 		self.__lastSend = 0.0
 			
@@ -197,10 +199,10 @@ class NAOServer(object):
 			self.__stiffnessData = self.__createStiffnessDatapackage()
 			self.__stiffnessDataLock.release()
 			
-			sleep(0.1)
+			sleep(0.25)
 			
 			# check if to send info package
-			if( time() - self.__lastSend > Settings.infoReplayDelay ):
+			if( time() - self.__lastSend > Settings.infoResendDelay ):
 				request = self.__createDataRequestPackage( dataCommands.SYS_SEND_INFO, [] )
 				data = self.createDataResponsePackage(request, False)
 				self.send(data)
@@ -214,13 +216,18 @@ class NAOServer(object):
 		data = {'jointStiffness': {}}
 		for joint in dataJoints.JOINTS:
 			try:
-				stiffnessList = self.__motionProxy.getStiffnesses( dataJoints.JOINTS[joint] )
+				
+				stiffnessList = []
+				if "stiffnessData" in self.__requiredData:
+					stiffnessList = self.__motionProxy.getStiffnesses( dataJoints.JOINTS[joint] )
+					
 				stiffness = 0.0
 				for stiff in stiffnessList:
 					if stiff > 0.0:
 						stiffness += stiff
 				
-				stiffness = stiffness / len(stiffnessList)
+				if len(stiffnessList) > 0:
+					stiffness = stiffness / len(stiffnessList)
 				data['jointStiffness'][ dataJoints.JOINTS[joint] ] = stiffness						
 					
 			except:
@@ -235,17 +242,17 @@ class NAOServer(object):
 		'''
 			
 		data = {
-			'masterVolume': self.__audioProxy.getOutputVolume(),
-			'playerVolume': self.__playerProxy.getMasterVolume(),
-			'speechVolume': self.__ttsProxy.getVolume(),
-			'speechVoice': self.__ttsProxy.getVoice(),
-			'speechLanguage': self.__ttsProxy.getLanguage(),
-			'speechLanguagesList': self.__speechLanguagesList,
-			'speechVoicesList': self.__speechVoicesList,
-			'speechPitchShift': self.__ttsProxy.getParameter("pitchShift"),
-			'speechDoubleVoice': self.__ttsProxy.getParameter("doubleVoice"),
-			'speechDoubleVoiceLevel': self.__ttsProxy.getParameter("doubleVoiceLevel"),
-			'speechDoubleVoiceTimeShift': self.__ttsProxy.getParameter("doubleVoiceTimeShift")
+			'masterVolume': self.__audioProxy.getOutputVolume() if "masterVolume" in self.__requiredData else 0,
+			'playerVolume': self.__playerProxy.getMasterVolume() if "playerVolume" in self.__requiredData else 0.0,
+			'speechVolume': self.__ttsProxy.getVolume() if "speechVolume" in self.__requiredData else 0.0,
+			'speechVoice': self.__ttsProxy.getVoice() if "speechVoice" in self.__requiredData else "",
+			'speechLanguage': self.__ttsProxy.getLanguage() if "speechLanguage" in self.__requiredData else "",
+			'speechLanguagesList': self.__speechLanguagesList if "speechLanguagesList" in self.__requiredData else [],
+			'speechVoicesList': self.__speechVoicesList if "speechVoicesList" in self.__requiredData else [],
+			'speechPitchShift': self.__ttsProxy.getParameter("pitchShift") if "speechPitchShift" in self.__requiredData else 0.0,
+			'speechDoubleVoice': self.__ttsProxy.getParameter("doubleVoice") if "speechDoubleVoice" in self.__requiredData else 0.0,
+			'speechDoubleVoiceLevel': self.__ttsProxy.getParameter("doubleVoiceLevel") if "speechDoubleVoiceLevel" in self.__requiredData else 0.0,
+			'speechDoubleVoiceTimeShift': self.__ttsProxy.getParameter("doubleVoiceTimeShift") if "speechDoubleVoiceTimeShift" in self.__requiredData else 0.0
 			}
 		return data
 		
@@ -324,5 +331,8 @@ class NAOServer(object):
 	
 	def isConnected(self):
 		return self.__connected
+	
+	def setRequiredData(self, data=[]):
+		self.__requiredData = data
 	
 		

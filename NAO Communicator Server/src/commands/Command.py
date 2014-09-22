@@ -58,7 +58,7 @@ class NAOCommand(object):
 	'''
 	
 	@staticmethod
-	def resolveCmd(data, addr):
+	def resolveCmd(data, server):
 		'''
 		Resolves recieved data in form of [ command, [argument1, argument2, ...] ]
 		'''
@@ -66,7 +66,7 @@ class NAOCommand(object):
 		# go through commands list ans search for command
 		for cmd in NAOCommand.lst:
 			if str(cmd.cmd) == data['command']:
-				start_new_thread( cmd.exe, (data['commandArguments'], addr) )
+				start_new_thread( cmd.exe, (data['commandArguments'], server) )
 				return True
 		
 		print "could not find command " + str(data)				
