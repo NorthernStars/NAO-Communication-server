@@ -15,7 +15,6 @@ __all__ = [
            "cmdSitDown",
            "cmdStandUp",
            "cmdVelocityWalk",
-           "cmdChangeLang",
            "ledAngry",
            "ledBlink",
            "ledCautious",
@@ -28,5 +27,8 @@ __all__ = [
            "ledThinking",
            "ledSetEye",
            
-           "cmdMemoryEventRaise"
+           "cmdMemoryEventRaise",
+           "cmdPlayProgram",
+           "cmdStopProgram",
+           "cmdGetProgramStatus"
            ]

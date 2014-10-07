@@ -30,6 +30,9 @@ class NAOCommand(object):
 		
 		NAOCommand.lst.append( cmdSetJointStiffness.cmdSetJointStiffness() )
 		NAOCommand.lst.append( cmdMemoryEventRaise.cmdMemoryEventRaise() )
+		NAOCommand.lst.append( cmdPlayProgram.cmdPlayProgram() )
+		NAOCommand.lst.append( cmdStopProgram.cmdStopProgram() )
+		NAOCommand.lst.append( cmdGetProgramStatus.cmdGetProgramStatus() )
 		
 		NAOCommand.lst.append( cmdOpenHand.cmdOpenHand() )
 		NAOCommand.lst.append( cmdSetLifeState.cmdSetLifeState() )
