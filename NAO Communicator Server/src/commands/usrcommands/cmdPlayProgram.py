@@ -9,9 +9,12 @@ from settings.Settings import Settings
 
 from time import sleep
 from os.path import expanduser
+from math import radians
+from thread import start_new_thread
 
 from cmdSay import cmdSay
 from cmdMemoryEventRaise import cmdMemoryEventRaise
+from cmdSetSpeechLanguage import cmdSetSpeechLanguage
 
 stopProgramFlag = False
 programRunning = -1
@@ -20,6 +23,8 @@ class cmdPlayProgram(object):
     '''
     classdocs
     '''
+    
+    __motionActive = False
 
 
     def __init__(self):
@@ -27,6 +32,7 @@ class cmdPlayProgram(object):
         Constructor
         '''
         self.cmd = "PLAY_PROGRAM"
+        self.__motionActive = False
         
     def exe(self, args=None, addr=None):
         
@@ -68,8 +74,31 @@ class cmdPlayProgram(object):
                     
                 elif cmd['name'] == 'Play':
                     self.__play( cmd['data']['file'] ) 
+                    
+                elif cmd['name'] == 'Language':
+                    cmdSetSpeechLanguage().exe( [cmd['data']['language']] , addr)
+                    
+                elif cmd['name'] == 'Walk to':
+                    self.__walk_to( cmd['data'] ) 
         
         programRunning = -1
+        
+    def __walk_to(self, data):
+        #self.__posture("Stand")
+        motion = ALProxy("ALMotion", Settings.naoHostName, Settings.naoPort)
+        motion.setMoveArmsEnabled( data['arms'], data['arms'] )
+        self.__motionActive = True
+        #start_new_thread( self.__motion_background_task, () )
+        motion.moveTo( data['x'], data['y'], radians(data['theta']) )
+       
+        self.__motionActive = False
+        
+    def __motion_background_task(self):
+        motion = ALProxy("ALMotion", Settings.naoHostName, Settings.naoPort)
+        while self.__motionActive:
+            if stopProgramFlag:
+                motion.stopMove()
+                
         
     def __play(self, data):
         audio = ALProxy("ALLeds", Settings.naoHostName, Settings.naoPort)
