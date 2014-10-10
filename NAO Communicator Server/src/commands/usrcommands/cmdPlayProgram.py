@@ -87,13 +87,14 @@ class cmdPlayProgram(object):
         #self.__posture("Stand")
         motion = ALProxy("ALMotion", Settings.naoHostName, Settings.naoPort)
         motion.setMoveArmsEnabled( data['arms'], data['arms'] )
+        
         self.__motionActive = True
-        #start_new_thread( self.__motion_background_task, () )
-        motion.moveTo( data['x'], data['y'], radians(data['theta']) )
-       
+        start_new_thread( self.__motion_background_task, () )
+        motion.moveTo( data['x'], data['y'], radians(data['theta']) )    
         self.__motionActive = False
         
     def __motion_background_task(self):
+        global stopProgramFlag
         motion = ALProxy("ALMotion", Settings.naoHostName, Settings.naoPort)
         while self.__motionActive:
             if stopProgramFlag:
@@ -107,6 +108,7 @@ class cmdPlayProgram(object):
         aID = audio.post.playFile(data)
         
         # wait for sound to finish
+        global stopProgramFlag
         while not stopProgramFlag and audio.isRunning(aID):
             sleep(0.001)
             
@@ -142,6 +144,7 @@ class cmdPlayProgram(object):
         '''
         Static function to set stop flag
         '''
+        global stopProgramFlag
         stopProgramFlag = True
         
     @staticmethod
@@ -149,4 +152,5 @@ class cmdPlayProgram(object):
         '''
         Static function to get program status
         '''
+        global programRunning
         return programRunning

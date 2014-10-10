@@ -17,7 +17,6 @@ class cmdStopProgram(object):
         '''
         self.cmd = "STOP_PROGRAM"
         
-    def exe(self, args=None, addr=None):        
+    def exe(self, args=None, socket=None):        
         # set stop flag
         cmdPlayProgram.stopProgram()
-        print addr
