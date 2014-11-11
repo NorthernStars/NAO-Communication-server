@@ -34,7 +34,7 @@ class cmdPlayProgram(object):
         self.cmd = "PLAY_PROGRAM"
         self.__motionActive = False
         
-    def exe(self, args=None, addr=None):
+    def exe(self, args=None, server=None):
         
         global stopProgramFlag
         global programRunning
@@ -55,7 +55,7 @@ class cmdPlayProgram(object):
                            
                 # select command
                 if cmd['name'] == 'Say':
-                    cmdSay().exe([cmd['data']['text'].replace("\u0027", "'"), 100, 100], addr)
+                    cmdSay().exe([cmd['data']['text'].replace("\u0027", "'"), 100, 100], server)
                     
                 elif cmd['name'] == 'Wait':
                     self.__wait( cmd['data']['time'] )
@@ -67,7 +67,7 @@ class cmdPlayProgram(object):
                     self.__eye_leds( cmd['data']['color'] )
                     
                 elif cmd['name'] == 'Hello':
-                    cmdMemoryEventRaise().exe(["animationHello"], addr)
+                    cmdMemoryEventRaise().exe(["animationHello"], server)
                     
                 elif cmd['name'] == 'Stiffness':
                     self.__stiffness( cmd['data'] )
@@ -76,12 +76,53 @@ class cmdPlayProgram(object):
                     self.__play( cmd['data']['file'] ) 
                     
                 elif cmd['name'] == 'Language':
-                    cmdSetSpeechLanguage().exe( [cmd['data']['language']] , addr)
+                    cmdSetSpeechLanguage().exe( [cmd['data']['language']] , server)
                     
                 elif cmd['name'] == 'Walk to':
-                    self.__walk_to( cmd['data'] ) 
+                    self.__walk_to( cmd['data'] )
+                
+                elif cmd['name'] == 'Sensor':
+                    self.__sensor( cmd['data'] )
         
         programRunning = -1
+        
+    def __sensor(self, data):
+        global stopProgramFlag
+        
+        if 'type' in data and 'value' in data:
+            if data['type'] == 'Tactile' or data['type'] == 'Bumper':
+                sensor = ALProxy("ALTouch", Settings.naoHostName, Settings.naoPort)
+                value = str( data['value'] )
+                value = value.replace("Left Hand", "LHand").replace("Right Hand", "RHand")
+                value = value.replace("Left Bumper", "LFoot/Bumper/Left").replace("Right Bumper", "RFoot/Bumper/Right")
+                value = value.replace(" Side", "")
+                value = value.replace(" ", "/Touch/")
+                ret = False
+                print value
+                print sensor.getStatus()
+                while not ret and not stopProgramFlag:
+                    for sens in sensor.getStatus():
+                        if sens[0] == value:
+                            ret = sens[1]                    
+                    sleep(0.01)
+             
+#             elif data['type'] == 'Chest button':
+#                 pass
+            
+            elif data['type'] == 'Sonar':
+                mem = ALProxy("ALMemory", Settings.naoHostName, Settings.naoPort)
+                sonar = ALProxy("ALSonar", Settings.naoHostName, Settings.naoPort)
+                sonar.subscribe("NAOCOM")
+                
+                key = str( data['value'] )
+                key = key.replace("detected", "Detected").replace("NOT", "Nothing").replace(" ", "")
+                key = "Sonar" + key
+                value = mem.getData(key)
+                while value == mem.getData(key) and not stopProgramFlag:
+                    sleep(0.01)
+                    
+                sonar.unsubscribe("NAOCOM")
+                
         
     def __walk_to(self, data):
         #self.__posture("Stand")
@@ -90,7 +131,9 @@ class cmdPlayProgram(object):
         
         self.__motionActive = True
         start_new_thread( self.__motion_background_task, () )
-        motion.moveTo( data['x'], data['y'], radians(data['theta']) )    
+        print "move to", data['x'], data['y'], radians(data['theta'])
+        motion.moveTo( data['x'], data['y'], radians(data['theta']) )
+        print "move done"    
         self.__motionActive = False
         
     def __motion_background_task(self):
