@@ -176,6 +176,12 @@ class NAOServer(object):
 				
 		return data
 	
+	def createDataRequestPackage(self, command="", arguments=[]):
+		'''
+		Creates a request package
+		'''
+		return {"command": command, "commandArguments": arguments}
+	
 	def __createDataRequestPackage(self, aCommand, aArguments=[] ):
 		'''
 		Creates data request package

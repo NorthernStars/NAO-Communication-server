@@ -51,7 +51,13 @@ class cmdPlayProgram(object):
             
             # try to get cmd            
             cmd = eval( str(cmd) )
-            if 'name' in cmd and 'data' in cmd:     
+            if 'name' in cmd and 'data' in cmd: 
+                
+                # send current command index
+                if server:
+                    data = server.createDataRequestPackage("PROGRAM_STATUS", [str(programRunning)])
+                    data = server.createDataResponsePackage(data)
+                    server.send(data)  
                            
                 # select command
                 if cmd['name'] == 'Say':
@@ -85,6 +91,11 @@ class cmdPlayProgram(object):
                     self.__sensor( cmd['data'] )
         
         programRunning = -1
+        # send current command index
+        if server:
+            data = server.createDataRequestPackage("PROGRAM_STATUS", [str(programRunning)])
+            data = server.createDataResponsePackage(data, False)
+            server.send(data)
         
     def __sensor(self, data):
         global stopProgramFlag
@@ -176,9 +187,10 @@ class cmdPlayProgram(object):
         posture.goToPosture( str(data), 0.8 )
         
     def __wait(self, data):
+        global stopProgramFlag
         i = float(data)/0.001
         
-        while i > 0:
+        while i > 0 and not stopProgramFlag:
             sleep(0.001)
             i -= 1.0
         
