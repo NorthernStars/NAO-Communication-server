@@ -169,7 +169,8 @@ class NAOServer(object):
 			'batteryLevel': int( self.__batProxy.getBatteryCharge() ),
 			'lifeState': self.__lifeProxy.getState() if "lifeState" in self.__requiredData else "disabled",
 			'stiffnessData': self.__stiffnessData,
-			'audioData': self.__audioData }
+			'audioData': self.__audioData,
+			'customMemoryEvents': Settings.memoryCustomEvents }
 		
 		self.__audioDataLock.release()
 		self.__stiffnessDataLock.release()

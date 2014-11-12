@@ -15,3 +15,5 @@ class Settings(object):
     serverDefaultPort = 5050
     serverServiceType = "_naocom._tcp"
     infoResendDelay = 1.0
+    memoryCustomEventsFile = "almemory_custom.events"
+    memoryCustomEvents = {}

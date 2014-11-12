@@ -28,6 +28,7 @@ __all__ = [
            "ledSetEye",
            
            "cmdMemoryEventRaise",
+           "cmdMemoryEventAdd",
            "cmdPlayProgram",
            "cmdStopProgram",
            "cmdGetProgramStatus"
