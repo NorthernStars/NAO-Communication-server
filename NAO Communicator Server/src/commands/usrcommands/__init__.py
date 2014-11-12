@@ -29,6 +29,7 @@ __all__ = [
            
            "cmdMemoryEventRaise",
            "cmdMemoryEventAdd",
+           "cmdMemoryEventRemove",
            "cmdPlayProgram",
            "cmdStopProgram",
            "cmdGetProgramStatus"
