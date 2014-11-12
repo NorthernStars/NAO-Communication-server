@@ -145,9 +145,12 @@ class cmdPlayProgram(object):
         
         self.__motionActive = True
         start_new_thread( self.__motion_background_task, () )
-        print "move to", data['x'], data['y'], radians(data['theta'])
+
+        collisionDetectionEnabled = motion.getExternalCollisionProtectionEnabled("Move")
+        motion.setExternalCollisionProtectionEnabled("Move", False)
         motion.moveTo( data['x'], data['y'], radians(data['theta']) )
-        print "move done"    
+        motion.setExternalCollisionProtectionEnabled("Move", collisionDetectionEnabled) 
+        
         self.__motionActive = False
         
     def __motion_background_task(self):
