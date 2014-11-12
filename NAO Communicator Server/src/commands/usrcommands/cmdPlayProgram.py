@@ -40,14 +40,13 @@ class cmdPlayProgram(object):
         global programRunning
         
         stopProgramFlag = False
+        programRunning = 0
         
         for cmd in args:
             
+            # check if to stop
             if stopProgramFlag:
                 break;
-            
-            # increment command counter
-            programRunning += 1
             
             # try to get cmd            
             cmd = eval( str(cmd) )
@@ -89,6 +88,10 @@ class cmdPlayProgram(object):
                 
                 elif cmd['name'] == 'Sensor':
                     self.__sensor( cmd['data'] )
+                    
+            
+            # increment command counter
+            programRunning += 1
         
         programRunning = -1
         # send current command index
