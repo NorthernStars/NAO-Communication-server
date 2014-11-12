@@ -10,7 +10,7 @@ from settings.Settings import Settings
 from network.serverManager import ServerManager
 from commands.Command import NAOCommand
 
-REVISION = 0
+
 
 def parseSettings(args=[]):
 	'''

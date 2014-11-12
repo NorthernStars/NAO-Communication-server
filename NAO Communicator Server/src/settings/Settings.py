@@ -17,3 +17,4 @@ class Settings(object):
     infoResendDelay = 1.0
     memoryCustomEventsFile = "almemory_custom.events"
     memoryCustomEvents = {}
+    revision = 0

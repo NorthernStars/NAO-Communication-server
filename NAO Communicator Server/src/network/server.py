@@ -14,7 +14,6 @@ from time import time
 from threading import Lock
 from time import sleep
 from thread import start_new_thread
-from communication_server import REVISION
 
 class NAOServer(object):
 	'''
@@ -166,7 +165,7 @@ class NAOServer(object):
 		data = {
 			'request': request,
 			'requestSuccessfull': success,
-			'revision': REVISION,
+			'revision': Settings.revision,
 			'naoName': self.__robotName,
 			'batteryLevel': int( self.__batProxy.getBatteryCharge() ),
 			'lifeState': self.__lifeProxy.getState() if "lifeState" in self.__requiredData else "disabled",
