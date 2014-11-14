@@ -165,7 +165,7 @@ class NAOServer(object):
 		data = {
 			'request': request,
 			'requestSuccessfull': success,
-			'revision': Settings.revision,
+			'revision': str(Settings.revision).replace("L", "").replace("l", ""),
 			'naoName': self.__robotName,
 			'batteryLevel': int( self.__batProxy.getBatteryCharge() ),
 			'lifeState': self.__lifeProxy.getState() if "lifeState" in self.__requiredData else "disabled",
