@@ -19,6 +19,7 @@ def parseSettings():
 	parser.add_argument( "-sip", "--serverip", help="Server ip (default: 127.0.0.1)", type=str, default="127.0.0.1" )
 	parser.add_argument( "-sp", "--serverport", help="Server port (default: 5050)", type=int, default=5050 )
 	parser.add_argument( "-st", "--servicetype", help="Network service type (default _naocom._tcp)", type=str, default="_naocom._tcp" )
+	parser.add_argument("-sysival", "--systeminforenewinterval", help="Interval to renew system information (default: 1.0)", type=float, default=1.0)
 	parser.add_argument("-log", "--loglevel", help="Log level (default: INFO)", type=str, default="INFO")
 
 	args = parser.parse_args()
@@ -27,6 +28,7 @@ def parseSettings():
 	Settings.serverDefaultIP = args.serverip
 	Settings.serverDefaultPort = args.serverport
 	Settings.serverServiceType = args.servicetype
+	Settings.systemInfoRenewInterval = args.systeminforenewinterval
 
 	numeric_level = getattr(logging, args.loglevel.upper(), None)
 	if not isinstance(numeric_level, int):

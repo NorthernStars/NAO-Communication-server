@@ -1,6 +1,7 @@
 import logging
 import dataCommands
 from server import NAOServer
+from settings.Settings import Settings
 from commands.Command import NAOCommand
 
 class ServerReader(object):
@@ -31,7 +32,7 @@ class ServerReader(object):
 
 			logging.info( "starting server reader on %s", self.host )
 			self.__server = False
-			self.__server = NAOServer( self.host )
+			self.__server = NAOServer( self.host, Settings.serverDefaultPort )
 
 			if not self.__server.isConnected():
 				self.close()
@@ -76,6 +77,18 @@ class ServerReader(object):
 				else:
 					logging.debug( "no data received" )
 
+	def __sendSystemInfoData(self, data):
+		"""
+		Sends system information data to remote client
+		:param data: Request data
+		:return: True if successful, false othwerwise
+		"""
+		if self.__server:
+			data = self.__server.createDataResponsePackage(data, True)
+			return self.__server.send(data)
+		logging.error( "no server set!" )
+		return False
+
 
 	def __handleData(self, data, addr):
 		"""
@@ -84,6 +97,7 @@ class ServerReader(object):
 		:param addr:	Remote address of received data
 		:return: None
 		"""
+
 		# check for connect
 		if data:
 			if 'command' in data and 'commandArguments' in data:
@@ -92,40 +106,44 @@ class ServerReader(object):
 
 				# handle build in commands
 				if data['command'] == dataCommands.SYS_DISCONNECT:
-					data = self.__server.createDataResponsePackage(data, True)
-					self.__server.send(data);
+					self.__sendSystemInfoData(data)
 					disconnect = True
 
 				elif data['command'] == dataCommands.SYS_GET_INFO:
-					data = self.__server.createDataResponsePackage(data, True)
 					disconnect = not self.__server.send(data)
 
 				elif data['command'] == dataCommands.SYS_SET_REQUIRED_DATA:
 					self.__server.setRequiredData( data['commandArguments'] )
-					data = self.__server.createDataResponsePackage(data, True)
-					disconnect = not self.__server.send(data)
+					disconnect = not self.__sendSystemInfoData(data)
 
-				# handle user
+				# handle user command
 				else:
 					ret = NAOCommand.resolveCmd( data, self.__server )
 					data = self.__server.createDataResponsePackage(data, ret)
-					disconnect = not self.__server.send(data)
+
+					if self.__server.send(data):
+						# also send system information
+						disconnect = not self.__sendSystemInfoData(data)
+					else:
+						disconnect = True
 
 			# handle protocol error
 			else:
-				data = self.__server.createDataResponsePackage(data, False)
-				disconnect = not self.__server.send(data)
+				logging.error( "Protocol error receiving %s", str(data) )
+				disconnect = not self.__sendSystemInfoData(data)
 
 
-			# check if command was successfully executed
+			# check if command was executed succesfuly
 			if disconnect:
+				logging.warning( "restarting server due to communication errors." )
 				self.__server.close(True)
 
 
-	'''
-	Closes __server reader
-	'''
 	def close(self):
+		"""
+		Closes server reader
+		:return: None
+		"""
 		self.__run = False
 		if self.__server:
 			self.__server.close()

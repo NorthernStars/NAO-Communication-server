@@ -1,7 +1,6 @@
 import socket
 import dataCommands
 import dataJoints
-import sys
 import logging
 from naoqi import ALProxy
 from settings.Settings import Settings
@@ -65,6 +64,8 @@ class NAOServer(object):
 		except socket.gaierror:
 			self.__addr = (Settings.serverDefaultIP, port)
 
+		logging.error( str(self.__addr) )
+
 		self.__sysProxy = ALProxy("ALSystem", Settings.naoHostName, Settings.naoPort)
 		self.__batProxy = ALProxy("ALBattery", Settings.naoHostName, Settings.naoPort)
 		self.__lifeProxy = ALProxy("ALAutonomousLife", Settings.naoHostName, Settings.naoPort)
@@ -79,6 +80,8 @@ class NAOServer(object):
 
 		self.__stiffnessData = {}
 		self.__audioData = {}
+		self.__batLevel = 0
+		self.__lifeState = None
 
 		self.__stiffnessDataLock = Lock()
 		self.__audioDataLock = Lock()
@@ -118,16 +121,20 @@ class NAOServer(object):
 							self.__addr = sockaddr
 							break
 
+					# bind socket to ip and port
 					logging.debug( "binding server to %s", str(self.__addr) )
 					self.__sock.bind( self.__addr )
 					self.__sock.listen(1)
 
+				# waiting for connection
 				logging.debug( "%s waiting for connection", self.__addr )
 				while not self.__conn:
 					self.__conn, self.__remoteAddr = self.__sock.accept()
 
-				logging.debug( "connected %s to %s", self.__addr, self.__remoteAddr )
+				# waiting for connection handshake
+				logging.debug( "connected %s to %s, waiting for handshake", self.__addr, self.__remoteAddr )
 				if self.__connectionHandshake():
+					logging.debug( "connection handshake with %s successful", self.__remoteAddr )
 					return True
 				logging.error( "handshake with %s failed", self.__remoteAddr )
 
@@ -173,8 +180,8 @@ class NAOServer(object):
 			'requestSuccessfull': success,
 			'revision': str(Settings.revision).replace("L", "").replace("l", ""),
 			'naoName': self.__robotName,
-			'batteryLevel': int( self.__batProxy.getBatteryCharge() ),
-			'lifeState': self.__lifeProxy.getState() if "lifeState" in self.__requiredData else "disabled",
+			'batteryLevel': self.__batLevel,
+			'lifeState': self.__lifeState,
 			'stiffnessData': self.__stiffnessData,
 			'audioData': self.__audioData,
 			'customMemoryEvents': Settings.memoryCustomEvents }
@@ -211,14 +218,10 @@ class NAOServer(object):
 			self.__stiffnessData = self.__createStiffnessDatapackage()
 			self.__stiffnessDataLock.release()
 
-			sleep(0.25)
+			self.__batLevel = self.__batProxy.getBatteryCharge()
+			self.__lifeState = self.__lifeProxy.getState() if "lifeState" in self.__requiredData else "disabled"
 
-			# check if to send info package
-			if( time() - self.__lastSend > Settings.infoResendDelay ):
-				request = self.createDataRequestPackage( dataCommands.SYS_SEND_INFO, [] )
-				data = self.createDataResponsePackage(request, False)
-				self.send(data)
-
+			sleep(Settings.systemInfoRenewInterval)
 
 	def __createStiffnessDatapackage(self):
 		"""

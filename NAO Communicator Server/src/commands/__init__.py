@@ -1,1 +1,1 @@
-__all__ = [ "Command" ]
+__all__ = [ "NAOCommand" ]
