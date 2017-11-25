@@ -1,8 +1,3 @@
-'''
-Created on 07.09.2012
-
-@author: hannes
-'''
 from commands.usrcommands import * 			# @UnusedWildImport
 from thread import start_new_thread
 import logging
@@ -22,7 +17,7 @@ class NAOCommand(object):
 	@staticmethod
 	def addCmds():
 		"""
-		Adds commands to a lst and returns that lst
+		Adds commands to a list (NAOCommand.lst) and returns that list
 		"""
 		logging.info( "Importing commands %s", str(commands.usrcommands.__all__) )
 		NAOCommand.lst.append( cmdSetSystemVolume.cmdSetSystemVolume() )
@@ -67,6 +62,15 @@ class NAOCommand(object):
 	
 	@staticmethod
 	def resolveCmd(data, server):
+		"""
+		Resolves command.
+		Command name will be used to resolve from command class argument cmd.
+		Optional arguments will be passed to command class execution.
+		Command will be started as new thread.
+		:param data:	List of command data: [ [command, [arg1, arg2] ]
+		:param server:	NAOServer object that received the data. Can be used to send data back
+		:return:		True if command was found and executed successful, false othwerwise
+		"""
 		'''
 		Resolves recieved data in form of [ command, [argument1, argument2, ...] ]
 		'''
