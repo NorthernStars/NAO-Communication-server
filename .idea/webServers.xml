@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="5695dbe5-62ce-4c56-b52d-9cfb366d4bae" name="Grace" url="http://192.168.1.68">
+        <fileTransfer host="192.168.1.68" port="22" rootFolder="/var/persistent/home/nao" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

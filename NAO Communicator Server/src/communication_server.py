@@ -1,8 +1,3 @@
-'''
-Created on 07.09.2012
-
-@author: hannes
-'''
 import os, sys, argparse
 import logging
 from time import sleep
@@ -43,17 +38,18 @@ def parseSettings():
 
 if __name__ == '__main__':
 
+	# parse settings
+	parseSettings();
+	logging.debug("Parsed command line options")
+
 	# set current working path
 	path = os.path.dirname(sys.argv[0])
 	if not path:
 		path = str(os.getcwd())
 		sys.argv[0] = path + "/" + str(sys.argv[0])
 
-		print "set working path from " + str(os.getcwd()) + " to " + str(path)
+		logging.debug("set working path from %s to %s", str(os.getcwd()), str(path))
 		os.chdir(path)
-
-	# parse settings
-	parseSettings();
 
 	# create commands list
 	NAOCommand.addCmds()
@@ -61,8 +57,9 @@ if __name__ == '__main__':
 
 	# Endlosschleife
 	while(True):
-		servermanager.manage()
-		sleep(2)
+		if not servermanager.manage():
+			break;
+		sleep(5)
 
-	print "ERROR: Program terminated"
+	logging.error( "Terminated" )
 

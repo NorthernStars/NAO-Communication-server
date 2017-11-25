@@ -5,9 +5,9 @@ Created on 18.04.2013
 '''
 
 class Settings(object):
-    '''
+    """
     Settings class
-    '''
+    """
 
     naoHostName = None
     naoPort = None

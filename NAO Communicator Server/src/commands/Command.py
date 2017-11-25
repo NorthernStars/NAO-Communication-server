@@ -5,11 +5,13 @@ Created on 07.09.2012
 '''
 from commands.usrcommands import * 			# @UnusedWildImport
 from thread import start_new_thread
+import logging
+import commands.usrcommands
 
 class NAOCommand(object):
-	'''
-	Main command clas
-	'''
+	"""
+	Main command class
+	"""
 	lst = []
 	
 	'''
@@ -19,9 +21,10 @@ class NAOCommand(object):
 	'''
 	@staticmethod
 	def addCmds():
-		'''
-		adds commands to a lst and returns that lst
-		'''		
+		"""
+		Adds commands to a lst and returns that lst
+		"""
+		logging.info( "Importing commands %s", str(commands.usrcommands.__all__) )
 		NAOCommand.lst.append( cmdSetSystemVolume.cmdSetSystemVolume() )
 		NAOCommand.lst.append( cmdSetPlayerVolume.cmdSetPlayerVolume() )
 		NAOCommand.lst.append( cmdSetSpeechVolume.cmdSetSpeechVolume() )
@@ -74,6 +77,6 @@ class NAOCommand(object):
 				start_new_thread( cmd.exe, (data['commandArguments'], server) )
 				return True
 		
-		print "could not find command " + str(data)				
+		logging.warning( "could not find command %s", str(data) )
 		return False
 
