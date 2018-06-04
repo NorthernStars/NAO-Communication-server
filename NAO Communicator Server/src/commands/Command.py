@@ -1,9 +1,7 @@
-from commands.usrcommands import * 			# @UnusedWildImport
 from thread import start_new_thread
 import logging
 import os
 import inspect
-import commands.usrcommands
 
 class NAOCommand(object):
 	"""
