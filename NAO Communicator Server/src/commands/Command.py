@@ -93,7 +93,7 @@ class NAOCommand(object):
 										obj = cls(Settings, None)
 									else:
 										obj = cls()
-									
+								
 									# check if class is command class
 									if getattr( obj, 'cmd', None ):
 										NAOCommand.lst.append( obj )	# add to command list
@@ -135,14 +135,17 @@ class NAOCommand(object):
 				
 				# check if session is needed
 				nFuncArgs = len( inspect.getargspec( cmd.exe )[0] )
-				if nFuncArgs == 4:
-					start_new_thread( cmd.exe, (data['commandArguments'], server, session) )
+				args = ()
+				if nFuncArgs == 5:
+					args = (data['commandArguments'], server, session, Settings)
+				elif nFuncArgs == 4:
+					args = (data['commandArguments'], server, session)
 				elif nFuncArgs == 3:
-					start_new_thread( cmd.exe, (data['commandArguments'], server) )
+					args = (data['commandArguments'], server)
 				elif nFuncArgs == 2:
-					start_new_thread( cmd.exe, (data['commandArguments']) )
-				else:
-					start_new_thread( cmd.exe, () )
+					args = (data['commandArguments'])
+
+				start_new_thread( cmd.exe, args )
 					
 				return True
 		
