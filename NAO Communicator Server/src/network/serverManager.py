@@ -3,12 +3,12 @@ from subprocess import Popen, PIPE
 from serverReader import ServerReader
 from networkService import NetworkService
 from settings.Settings import Settings
-from naoqi import ALProxy
 from subprocess import check_output
+from time import sleep
 import logging
 import qi
 
-from time import sleep
+from commands.Command import NAOCommand
 
 class ServerManager(object):
 	"""
@@ -30,9 +30,12 @@ class ServerManager(object):
 		self.__exceptIps = exceptIps
 		self.__networkService = NetworkService()
 		
-		self.__app = qi.Application( ['-qi-url', "tcp://" + Settings.naoHostName + ":" + str(Settings.naoPort)] )
+		self.__app = qi.Application( url="tcp://" + Settings.naoHostName + ":" + str(Settings.naoPort) )
+		logging.info( "Connecting to %s", self.__app.url )
 		self.__app.start()
 		self.__session = self.__app.session
+		
+		NAOCommand.startDefaultModules(self.__session)
 
 	@staticmethod
 	def getLocalInterfaces():

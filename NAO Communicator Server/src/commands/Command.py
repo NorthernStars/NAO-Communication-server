@@ -14,7 +14,8 @@ class NAOCommand(object):
 	
 	@staticmethod
 	def __cleanTmp():
-		shutil.rmtree("tmp")
+		if os.path.exists("tmp"):
+			shutil.rmtree("tmp")
 		os.mkdir("tmp")
 		f = open("tmp/__init__.py", 'w')
 		f.close()
@@ -92,7 +93,7 @@ class NAOCommand(object):
 										obj = cls(Settings, None)
 									else:
 										obj = cls()
-										
+									
 									# check if class is command class
 									if getattr( obj, 'cmd', None ):
 										NAOCommand.lst.append( obj )	# add to command list
@@ -100,6 +101,16 @@ class NAOCommand(object):
 									
 								except Exception, e:
 									logging.error( "cannot import %s\n%s", cls, e )
+									
+	@staticmethod
+	def startDefaultModules(session):
+		"""
+		Starts the modules marked as default
+		"""
+		logging.info( "loading default modules" )
+		for cmd in NAOCommand.lst:
+			if getattr( cmd, 'default', None ):
+				NAOCommand.resolveCmd( { 'command': cmd.cmd, 'commandArguments': [] }, None, session )
 
 	
 	@staticmethod
@@ -109,7 +120,7 @@ class NAOCommand(object):
 		Command name will be used to resolve from command class argument cmd.
 		Optional arguments will be passed to command class execution.
 		Command will be started as new thread.
-		:param data:	List of command data: [ [command, [arg1, arg2] ]
+		:param data:	List of command data: { 'command': COMMAND, 'commandArguments': [arg1, arg2] ]
 		:param server:	NAOServer object that received the data. Can be used to send data back
 		:param session:	Session object for getting robot services
 		:return:		True if command was found and executed successful, false othwerwise
