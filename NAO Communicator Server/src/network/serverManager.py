@@ -63,14 +63,20 @@ class ServerManager(object):
 				ifacestr = ifacestr.split('\n')
 				ipv4 = None
 				ipv6 = None
+
 				for entry in ifacestr:
 
 					# check for ip addresses
 					if 'inet6' in entry:
-						ipv6 = entry.strip().split(':', 1)[1].strip().split(' ')[0].strip().split('/')[0]
-						ipv6 += "%"+ifname
+						#ipv6 = entry.strip().split(':', 1)[1].strip().split(' ')[0].strip().split('/')[0]
+						#ipv6 += "%"+ifname
+						pass
+					
 					elif 'inet' in entry:
-						ipv4 = entry.strip().split(':', 1)[1].strip().split(' ')[0].strip()
+						if not ":" in entry:
+							ipv4 = entry.strip().split(' ')[1].strip()
+						else:
+							ipv4 = entry.strip().split(':', 1)[1].strip().split(' ')[0].strip()
 
 				if ipv4 != None or ipv6 != None:
 					localifaces.append( (ifname, ipv4, ipv6) )
