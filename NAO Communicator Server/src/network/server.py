@@ -64,7 +64,7 @@ class NAOServer(object):
 		except socket.gaierror:
 			self.__addr = (Settings.serverDefaultIP, port)
 
-		logging.error( str(self.__addr) )
+		logging.debug( "Init server for %s", self.__addr )
 		
 		self.__session = session
 
