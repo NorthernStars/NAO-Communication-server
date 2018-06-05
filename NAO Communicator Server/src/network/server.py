@@ -2,7 +2,6 @@ import socket
 import dataCommands
 import dataJoints
 import logging
-from naoqi import ALProxy
 from settings.Settings import Settings
 from time import time
 from threading import Lock
@@ -43,8 +42,9 @@ class NAOServer(object):
 	__requiredData = []
 
 	__lastSend = 0.0
+	__session = None
 
-	def __init__(self, host=Settings.serverDefaultIP, port=Settings.serverDefaultPort, framesize=1024):
+	def __init__(self, session, host=Settings.serverDefaultIP, port=Settings.serverDefaultPort, framesize=1024):
 		"""
 		Constructor
 		:param host:		hostname or ip to bind to
@@ -65,14 +65,16 @@ class NAOServer(object):
 			self.__addr = (Settings.serverDefaultIP, port)
 
 		logging.error( str(self.__addr) )
+		
+		self.__session = session
 
-		self.__sysProxy = ALProxy("ALSystem", Settings.naoHostName, Settings.naoPort)
-		self.__batProxy = ALProxy("ALBattery", Settings.naoHostName, Settings.naoPort)
-		self.__lifeProxy = ALProxy("ALAutonomousLife", Settings.naoHostName, Settings.naoPort)
-		self.__motionProxy = ALProxy("ALMotion", Settings.naoHostName, Settings.naoPort)
-		self.__audioProxy = ALProxy("ALAudioDevice", Settings.naoHostName, Settings.naoPort)
-		self.__ttsProxy = ALProxy("ALTextToSpeech", Settings.naoHostName, Settings.naoPort)
-		self.__playerProxy = ALProxy("ALAudioPlayer", Settings.naoHostName, Settings.naoPort)
+		self.__sysProxy = self.__session.service("ALSystem")
+		self.__batProxy = self.__session.service("ALBattery")
+		self.__lifeProxy = self.__session.service("ALAutonomousLife")
+		self.__motionProxy = self.__session.service("ALMotion")
+		self.__audioProxy = self.__session.service("ALAudioDevice")
+		self.__ttsProxy = self.__session.service("ALTextToSpeech")
+		self.__playerProxy = self.__session.service("ALAudioPlayer")
 
 		self.__robotName = self.__sysProxy.robotName()
 		self.__speechLanguagesList = self.__ttsProxy.getAvailableLanguages()

@@ -10,12 +10,13 @@ class ServerReader(object):
 	"""
 
 
-	def __init__(self, host="localhost"):
+	def __init__(self, host="localhost", session=None):
 		"""
 		Constructor
 		:param host: Hostname or ip to connect to
 		"""
 		self.host = host
+		self.__session = session
 		self.__run = True
 		self.__resetTimer = 0.0
 		self.__restarted = False
@@ -30,9 +31,9 @@ class ServerReader(object):
 		# create & connect __server
 		while self.__run:
 
-			logging.info( "starting server reader on %s", self.host )
+			logging.info( "starting server reader %s on %s", self.host, self )
 			self.__server = False
-			self.__server = NAOServer( self.host, Settings.serverDefaultPort )
+			self.__server = NAOServer( self.__session, self.host, Settings.serverDefaultPort )
 
 			if not self.__server.isConnected():
 				self.close()
@@ -118,7 +119,7 @@ class ServerReader(object):
 
 				# handle user command
 				else:
-					ret = NAOCommand.resolveCmd( data, self.__server )
+					ret = NAOCommand.resolveCmd( data, self.__server, self.__session )
 					data = self.__server.createDataResponsePackage(data, ret)
 
 					if self.__server.send(data):

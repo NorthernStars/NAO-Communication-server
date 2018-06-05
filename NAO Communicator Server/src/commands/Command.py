@@ -85,10 +85,10 @@ class NAOCommand(object):
 								try:
 							
 									# try to create object from class
-									classArgs = inspect.getargspec( cls.__init__ )[0]
-									if len(classArgs) == 2:
+									nClassArgs = len( inspect.getargspec( cls.__init__ )[0] )
+									if nClassArgs == 2:
 										obj = cls(Settings)
-									elif len(classArgs) == 3:
+									elif nClassArgs == 3:
 										obj = cls(Settings, None)
 									else:
 										obj = cls()
@@ -103,7 +103,7 @@ class NAOCommand(object):
 
 	
 	@staticmethod
-	def resolveCmd(data, server):
+	def resolveCmd(data, server, session):
 		"""
 		Resolves command.
 		Command name will be used to resolve from command class argument cmd.
@@ -111,6 +111,7 @@ class NAOCommand(object):
 		Command will be started as new thread.
 		:param data:	List of command data: [ [command, [arg1, arg2] ]
 		:param server:	NAOServer object that received the data. Can be used to send data back
+		:param session:	Session object for getting robot services
 		:return:		True if command was found and executed successful, false othwerwise
 		"""
 		'''
@@ -120,7 +121,18 @@ class NAOCommand(object):
 		# go through commands list ans search for command
 		for cmd in NAOCommand.lst:
 			if str(cmd.cmd) == data['command']:
-				start_new_thread( cmd.exe, (data['commandArguments'], server) )
+				
+				# check if session is needed
+				nFuncArgs = len( inspect.getargspec( cmd.exe )[0] )
+				if nFuncArgs == 3:
+					start_new_thread( cmd.exe, (data['commandArguments'], server, session) )
+				elif nFuncArgs == 2:
+					start_new_thread( cmd.exe, (data['commandArguments'], server) )
+				elif nFuncArgs == 1:
+					start_new_thread( cmd.exe, (data['commandArguments']) )
+				else:
+					start_new_thread( cmd.exe, () )
+					
 				return True
 		
 		logging.warning( "could not find command %s", str(data) )

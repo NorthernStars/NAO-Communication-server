@@ -6,6 +6,7 @@ from settings.Settings import Settings
 from naoqi import ALProxy
 from subprocess import check_output
 import logging
+import qi
 
 from time import sleep
 
@@ -16,6 +17,9 @@ class ServerManager(object):
 	__networkService = None
 	__serverReader = []
 	__exceptIps = []
+	
+	__app = None
+	__session = None
 	__sysProxy = None
 
 	def __init__(self, exceptIps=["127.0.0.1", "0.0.0.0"]):
@@ -25,7 +29,10 @@ class ServerManager(object):
 		self.__serverReader = []
 		self.__exceptIps = exceptIps
 		self.__networkService = NetworkService()
-		self.__sysProxy = ALProxy("ALSystem", Settings.naoHostName, Settings.naoPort)
+		
+		self.__app = qi.Application( ['-qi-url', "tcp://" + Settings.naoHostName + ":" + str(Settings.naoPort)] )
+		self.__app.start()
+		self.__session = self.__app.session
 
 	@staticmethod
 	def getLocalInterfaces():
@@ -128,17 +135,24 @@ class ServerManager(object):
 		new = False
 		for ip in ips:
 			if not self.isIpInServerReadersList(ip):
-				self.__serverReader.append( ServerReader(ip) )
+				self.__serverReader.append( ServerReader(ip, self.__session) )
 				start_new_thread( self.__serverReader[len(self.__serverReader)-1].exe, () )
 				new = True
+				
+		# try to get ALSystem
+		sysProxy = None
+		try:
+			sysProxy = self.__session.service("ALSystem")
+		except Exception, e:
+			logging.error( "Cannot get ALSystem service", e )
 
 		# check if to restart network service
-		if new or len(ips) < 1:
-			self.__networkService.unregisterService( str(self.__sysProxy.robotName()), Settings.serverServiceType )
+		if sysProxy and (new or len(ips) < 1):
+				self.__networkService.unregisterService( str(sysProxy.robotName()), Settings.serverServiceType )				
 
-		if new:
+		if sysProxy and new:
 			logging.debug( "Registering network service" )
-			self.__networkService.registerService( str(self.__sysProxy.robotName()), Settings.serverServiceType, Settings.serverDefaultPort )
+			self.__networkService.registerService( str(sysProxy.robotName()), Settings.serverServiceType, Settings.serverDefaultPort )
 
 		# check for unsused readers
 		self.closeUnsusedReaders(ips)
