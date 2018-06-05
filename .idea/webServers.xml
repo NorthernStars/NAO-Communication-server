@@ -2,8 +2,8 @@
 <project version="4">
   <component name="WebServers">
     <option name="servers">
-      <webServer id="cad8912f-e98e-4456-9e94-643715be1d1c" name="Pepper Max" url="http://max.local">
-        <fileTransfer host="max.local" port="22" rootFolder="/data/home/nao" accessType="SFTP">
+      <webServer id="cad8912f-e98e-4456-9e94-643715be1d1c" name="Pepper Max" url="http://192.168.178.146">
+        <fileTransfer host="192.168.178.146" port="22" rootFolder="/data/home/nao" accessType="SFTP">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" />
           </advancedOptions>
