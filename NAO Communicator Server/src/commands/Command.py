@@ -1,7 +1,10 @@
 from thread import start_new_thread
+from settings.Settings import Settings
 import logging
 import os
+import sys
 import inspect
+import shutil
 
 class NAOCommand(object):
 	"""
@@ -9,50 +12,95 @@ class NAOCommand(object):
 	"""
 	lst = []
 	
-	'''
-	------------------------------------------------------
-	INSERT NEW NAO COMMANDS HERE
-	------------------------------------------------------
-	'''
+	@staticmethod
+	def __cleanTmp():
+		shutil.rmtree("tmp")
+		os.mkdir("tmp")
+		f = open("tmp/__init__.py", 'w')
+		f.close()
+	
+
+	@staticmethod
+	def __getUserModulesPaths():
+		dirs = []
+		for d in Settings.customModulesPath.split(","):
+			# check if path endswith /
+			if d.endswith("/"):
+				d = "".join( d.rsplit("/", 1) )
+				
+			# check if path exists and is directory:
+			if not os.path.exists(d) or not os.path.isdir(d):
+				logging.warning( "%s is not a valid directory", d )
+				continue
+			
+			# check if __init__.py is in path
+			if not os.path.exists( d + "/__init__.py" ):
+				logging.warning( "%s is missing __init__.py", d )
+				continue
+			
+			# copy files to tmp
+			packageName = d.rsplit("/")[-1]
+			shutil.copytree( d, "tmp/" + packageName )
+			
+			# add new path to dirs list
+			dirs.append( "tmp/" + packageName )
+		
+		return dirs
+			
+			
 	@staticmethod
 	def addCmds():
 		"""
 		Adds commands to a list (NAOCommand.lst) and returns that list
-		"""
+		"""		
+		# clean tmp
+		NAOCommand.__cleanTmp()
 		
-		# load modules dynamicaly
+		# get dirs of modules
 		dirs = ["commands/usrcommands"]				# list of dirs to search for modules
+		dirs = dirs + NAOCommand.__getUserModulesPaths()
+	
+		# load modules dynamicaly
 		for d in dirs:
-			logging.info( "searching for modules in %s", d )
-		
-			# get files in dir
-			for f in os.listdir(d):
+			logging.info( "searching for modules in %s", d )			
+			if not os.path.exists(d) or not os.path.isdir(d):
+				logging.warning( "%s is not a valid directory", d )
+			else:
+			
+				# create module path for import
 				modulePath = d.replace("/", ".") + "."
+			
+				# get files in dir		
+				for f in os.listdir(d):
 				
-				# import module
-				if f.endswith(".py") and not f.startswith("__") and not f.startswith("_"):
-					moduleName = modulePath + f.replace(".py", "")
-					module = __import__( moduleName, globals(), locals(), ['object'], -1 )
+					# import module
+					if f.endswith(".py") and not f.startswith("__") and not f.startswith("_"):
+						moduleName = modulePath + f.replace(".py", "")
+						module = __import__( moduleName, globals(), locals(), ['object'], -1 )
 				
-					# get classes from module
-					for name, cls in inspect.getmembers( module, inspect.isclass ):
-						if modulePath in cls.__module__:
+						# get classes from module
+						for name, cls in inspect.getmembers( module, inspect.isclass ):
+							if modulePath in cls.__module__:
 						
-							try:
+								try:
 							
-								# check if class is command class
-								obj = cls()
-								if getattr( obj, 'cmd', None ):
-									NAOCommand.lst.append( obj )	# add to command list
-									logging.debug( "imported %s", cls )
+									# try to create object from class
+									classArgs = inspect.getargspec( cls.__init__ )[0]
+									if len(classArgs) == 2:
+										obj = cls(Settings)
+									elif len(classArgs) == 3:
+										obj = cls(Settings, None)
+									else:
+										obj = cls()
+										
+									# check if class is command class
+									if getattr( obj, 'cmd', None ):
+										NAOCommand.lst.append( obj )	# add to command list
+										logging.debug( "imported %s", cls )
 									
-							except Exception, e:
-								logging.error( "cannot import %s\n%s", cls, e )
+								except Exception, e:
+									logging.error( "cannot import %s\n%s", cls, e )
 
-
-	'''
-	------------------------------------------------------
-	'''
 	
 	@staticmethod
 	def resolveCmd(data, server):
