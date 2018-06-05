@@ -16,6 +16,8 @@ def parseSettings():
 	parser = argparse.ArgumentParser()
 	parser.add_argument( "-rip", "--robotip", help="Robot ip (default: 127.0.0.1)", type=str, default="127.0.0.1" )
 	parser.add_argument( "-rp", "--robotport", help="Robot port", type=int, default=9559 )
+	parser.add_argument( "-rusr", "--robotuser", help="Robot login user (default: nao)", type=str, default="nao" )
+	parser.add_argument( "-rpw", "--robotpassword", help="Robot login password (default: nao)", type=str, default="nao" )
 	parser.add_argument( "-cmod", "--custommodules", help="Relative path to directory with custom modules to load (default ../custom)", type=str, default="../custom" )
 	parser.add_argument( "-sip", "--serverip", help="Server ip (default: 127.0.0.1)", type=str, default="127.0.0.1" )
 	parser.add_argument( "-sp", "--serverport", help="Server port (default: 5050)", type=int, default=5050 )
@@ -26,6 +28,8 @@ def parseSettings():
 	args = parser.parse_args()
 	Settings.naoHostName = args.robotip
 	Settings.naoPort = args.robotport
+	Settings.naoPassword = args.robotpassword
+	Settings.naoDefaultUser = args.robotuser
 	Settings.serverDefaultIP = args.serverip
 	Settings.serverDefaultPort = args.serverport
 	Settings.serverServiceType = args.servicetype

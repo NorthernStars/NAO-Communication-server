@@ -11,6 +11,8 @@ class Settings(object):
 
     naoHostName = "nao.local"
     naoPort = 9559
+    naoPassword = "nao"
+    naoDefaultUser= "nao"
     serverDefaultIP = "127.0.0.1"
     serverDefaultPort = 5050
     serverServiceType = "_naocom._tcp"
