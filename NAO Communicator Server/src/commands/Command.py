@@ -135,11 +135,11 @@ class NAOCommand(object):
 				
 				# check if session is needed
 				nFuncArgs = len( inspect.getargspec( cmd.exe )[0] )
-				if nFuncArgs == 3:
+				if nFuncArgs == 4:
 					start_new_thread( cmd.exe, (data['commandArguments'], server, session) )
-				elif nFuncArgs == 2:
+				elif nFuncArgs == 3:
 					start_new_thread( cmd.exe, (data['commandArguments'], server) )
-				elif nFuncArgs == 1:
+				elif nFuncArgs == 2:
 					start_new_thread( cmd.exe, (data['commandArguments']) )
 				else:
 					start_new_thread( cmd.exe, () )
