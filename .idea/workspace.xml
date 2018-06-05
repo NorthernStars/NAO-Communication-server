@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="55a8994a-e8c0-47aa-80a9-74bd754638e4" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/webServers.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/webServers.xml" afterDir="false" />
-    </list>
+    <list default="true" id="55a8994a-e8c0-47aa-80a9-74bd754638e4" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -14,37 +11,12 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="serverManager.py" pinned="true" current-in-tab="false">
+      <file leaf-file-name="serverManager.py" pinned="false" current-in-tab="true">
         <entry file="remoteDeploymentFS://&lt;cad8912f-e98e-4456-9e94-643715be1d1c&gt;/naocom/network/serverManager.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="585">
-              <caret line="137" column="29" selection-start-line="137" selection-start-column="24" selection-end-line="137" selection-end-column="29" />
+            <state>
               <folding>
                 <element signature="e#0#35#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="serverReader.py" pinned="true" current-in-tab="true">
-        <entry file="remoteDeploymentFS://&lt;cad8912f-e98e-4456-9e94-643715be1d1c&gt;/naocom/network/serverReader.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="495">
-              <caret line="33" column="76" selection-start-line="33" selection-start-column="76" selection-end-line="33" selection-end-column="76" />
-              <folding>
-                <element signature="e#0#14#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="server.py" pinned="true" current-in-tab="false">
-        <entry file="remoteDeploymentFS://&lt;cad8912f-e98e-4456-9e94-643715be1d1c&gt;/naocom/network/server.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="405">
-              <caret line="66" column="56" selection-start-line="66" selection-start-column="56" selection-end-line="66" selection-end-column="56" />
-              <folding>
-                <element signature="e#0#13#0" expanded="true" />
               </folding>
             </state>
           </provider>
