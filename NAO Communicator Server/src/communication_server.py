@@ -16,6 +16,7 @@ def parseSettings():
 	parser = argparse.ArgumentParser()
 	parser.add_argument( "-rip", "--robotip", help="Robot ip (default: 127.0.0.1)", type=str, default="127.0.0.1" )
 	parser.add_argument( "-rp", "--robotport", help="Robot port", type=int, default=9559 )
+	parser.add_argument( "-cmod", "--custommodules", help="Relative path to directory with custom modules to load (default ../custom)", type=str, default="../custom" )
 	parser.add_argument( "-sip", "--serverip", help="Server ip (default: 127.0.0.1)", type=str, default="127.0.0.1" )
 	parser.add_argument( "-sp", "--serverport", help="Server port (default: 5050)", type=int, default=5050 )
 	parser.add_argument( "-st", "--servicetype", help="Network service type (default _naocom._tcp)", type=str, default="_naocom._tcp" )
@@ -29,6 +30,7 @@ def parseSettings():
 	Settings.serverDefaultPort = args.serverport
 	Settings.serverServiceType = args.servicetype
 	Settings.systemInfoRenewInterval = args.systeminforenewinterval
+	Settings.customModulesPath = args.custommodules
 
 	numeric_level = getattr(logging, args.loglevel.upper(), None)
 	if not isinstance(numeric_level, int):

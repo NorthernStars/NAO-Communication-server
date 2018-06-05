@@ -17,4 +17,5 @@ class Settings(object):
     systemInfoRenewInterval = 1.0
     memoryCustomEventsFile = "almemory_custom.events"
     memoryCustomEvents = {}
+    customModulesPath = "../custom"
     revision = 1
