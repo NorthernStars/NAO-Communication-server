@@ -31,7 +31,7 @@ class ServerReader(object):
 		# create & connect __server
 		while self.__run:
 
-			logging.info( "starting server reader %s on %s", self.host, self )
+			logging.info( "starting server reader %s on %s", self, self.host )
 			self.__server = False
 			self.__server = NAOServer( self.__session, self.host, Settings.serverDefaultPort )
 
