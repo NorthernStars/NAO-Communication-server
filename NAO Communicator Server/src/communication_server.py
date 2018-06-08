@@ -1,9 +1,5 @@
-'''
-Created on 07.09.2012
-
-@author: hannes
-'''
-import os, sys
+import os, sys, argparse
+import logging
 from time import sleep
 
 from settings.Settings import Settings
@@ -12,68 +8,66 @@ from commands.Command import NAOCommand
 
 
 
-def parseSettings(args=[]):
-	'''
+def parseSettings():
+	"""
 	Function to parse settings from command line arguments
-	'''
-	i = 0
-	while i < len(args):
-		
-		if '?' in args[i]:
-			
-			# print help text
-			print "NAO Communication server syntax:"
-			print str(sys.argv[0]).split('/')[-1] + " [options]"
-			print "Options:"
-			print "-naohost <value>\tNAO host name or ip."
-			print "-naoport <value>\tNAO NAOqi port."
-			print "-serverip <value>\tCommunication server ip."
-			print "-serverport <value>\tCommuncation server port."
-			print "-servicetype <value>\tCommunication server network service type to publish."
-			print "-resenddelay <value>\tFloat value in sec. for delay between resending info data."
-			
-			return False
-			
-		elif args[i].startswith('-') and i < len(args)-1:
-			if "naohost" in args[i]:
-				Settings.naoHostName = args[i+1]
-			elif "naoport" in args[i]:
-				Settings.naoPort = args[i+1]
-			elif "serverip" in args[i]:
-				Settings.serverDefaultIP = args[i+1]
-			elif "serverport" in args[i]:
-				Settings.serverDefaultPort = args[i+1]
-			elif "servicetype" in args[i]:
-				Settings.serverServiceType = args[i+1]
-			elif "resenddelay" in args[i]:
-				Settings.infoResendDelay = float(args[i+1])
-		
-		i += 2
-		
+	"""
+
+	parser = argparse.ArgumentParser()
+	parser.add_argument( "-rip", "--robotip", help="Robot ip (default: 127.0.0.1)", type=str, default="127.0.0.1" )
+	parser.add_argument( "-rp", "--robotport", help="Robot port", type=int, default=9559 )
+	parser.add_argument( "-rusr", "--robotuser", help="Robot login user (default: nao)", type=str, default="nao" )
+	parser.add_argument( "-rpw", "--robotpassword", help="Robot login password (default: nao)", type=str, default="nao" )
+	parser.add_argument( "-cmod", "--custommodules", help="Relative path to directory with custom modules to load (default ../custom)", type=str, default="../custom" )
+	parser.add_argument( "-sip", "--serverip", help="Server ip (default: 127.0.0.1)", type=str, default="127.0.0.1" )
+	parser.add_argument( "-sp", "--serverport", help="Server port (default: 5050)", type=int, default=5050 )
+	parser.add_argument( "-st", "--servicetype", help="Network service type (default _naocom._tcp)", type=str, default="_naocom._tcp" )
+	parser.add_argument("-sysival", "--systeminforenewinterval", help="Interval to renew system information (default: 1.0)", type=float, default=1.0)
+	parser.add_argument("-log", "--loglevel", help="Log level (default: INFO)", type=str, default="INFO")
+
+	args = parser.parse_args()
+	Settings.naoHostName = args.robotip
+	Settings.naoPort = args.robotport
+	Settings.naoPassword = args.robotpassword
+	Settings.naoDefaultUser = args.robotuser
+	Settings.serverDefaultIP = args.serverip
+	Settings.serverDefaultPort = args.serverport
+	Settings.serverServiceType = args.servicetype
+	Settings.systemInfoRenewInterval = args.systeminforenewinterval
+	Settings.customModulesPath = args.custommodules
+
+	numeric_level = getattr(logging, args.loglevel.upper(), None)
+	if not isinstance(numeric_level, int):
+			raise ValueError('Invalid log level: %s' % args.loglevel)
+	else:
+		logging.basicConfig(level=numeric_level)
+
 	return True
 
 if __name__ == '__main__':
-	
-	# set current working padth	
+
+	# parse settings
+	parseSettings();
+	logging.debug("Parsed command line options")
+
+	# set current working path
 	path = os.path.dirname(sys.argv[0])
 	if not path:
 		path = str(os.getcwd())
 		sys.argv[0] = path + "/" + str(sys.argv[0])
-		
-	os.chdir(path)
-	print "set working path from " + str(os.getcwd()) + " to " + str(path)
-	
-	# parse settings 
-	parseSettings( sys.argv[1:] );
-	
+
+		logging.debug("set working path from %s to %s", str(os.getcwd()), str(path))
+		os.chdir(path)
+
 	# create commands list
 	NAOCommand.addCmds()
 	servermanager = ServerManager()
-		
-	# Endlosschleife	
+
+	# Endlosschleife
 	while(True):
-		servermanager.manage()
-		sleep(2)		
-	
-	print "ERROR: Program terminated"
-	
+		if not servermanager.manage():
+			break;
+		sleep(5)
+
+	logging.error( "Terminated" )
+
