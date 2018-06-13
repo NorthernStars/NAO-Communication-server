@@ -145,9 +145,16 @@ class NAOCommand(object):
 				elif nFuncArgs == 2:
 					args = (data['commandArguments'])
 
-				start_new_thread( cmd.exe, args )
-					
-				return True
+				# check if module has function to set command reference
+				func = getattr( cmd, "setResolveCommandFunction", None )
+				print func
+				if callable(func):
+					try:
+						cmd.setResolveCommandFunction( NAOCommand.resolveCmd )
+					except:
+						logging.warning( "Was not able to set resolve command function on module %s", cmd )
+
+				return start_new_thread( cmd.exe, args )
 		
 		logging.warning( "could not find command %s", str(data) )
 		return False
