@@ -24,6 +24,21 @@ class NAOCommand(object):
 	@staticmethod
 	def __getUserModulesPaths():
 		dirs = []
+
+		# check for subfolders
+		tmpCustomModulesPath = Settings.customModulesPath
+		if not ',' in Settings.customModulesPath:
+			d = Settings.customModulesPath
+			if os.path.exists(d) and os.path.isdir(d):
+
+				# check all subfolders
+				for f in os.listdir(d):
+					if os.path.isdir( d + "/" + f ):
+						tmpCustomModulesPath += "," + d + "/" + f
+
+			Settings.customModulesPath = tmpCustomModulesPath
+
+		# get and copy modules
 		for d in Settings.customModulesPath.split(","):
 			# check if path endswith /
 			if d.endswith("/"):
