@@ -175,7 +175,9 @@ class NAOCommand(object):
 					except:
 						logging.warning( "Was not able to set resolve command function on module %s", cmd )
 
-				return Thread( target=cmd.exe, args=args )
+				thread = Thread( target=cmd.exe, args=args )
+				thread.start()
+				return thread
 		
 		logging.warning( "Could not find command %s", str(data) )
 		return False
