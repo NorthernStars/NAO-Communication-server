@@ -1,4 +1,4 @@
-from thread import start_new_thread
+from threading import Thread
 from settings.Settings import Settings
 import logging
 import os
@@ -62,6 +62,13 @@ class NAOCommand(object):
 			dirs.append( "tmp/" + packageName )
 		
 		return dirs
+
+	@staticmethod
+	def hasCommand(command):
+		for cmd in NAOCommand.lst:
+			if str(cmd.cmd) == command:
+				return True
+		return False
 			
 			
 	@staticmethod
@@ -135,7 +142,7 @@ class NAOCommand(object):
 		Command name will be used to resolve from command class argument cmd.
 		Optional arguments will be passed to command class execution.
 		Command will be started as new thread.
-		:param data:	List of command data: { 'command': COMMAND, 'commandArguments': [arg1, arg2] ]
+		:param data:	List of command data: { 'command': COMMAND, 'commandArguments': [arg1, arg2] }
 		:param server:	NAOServer object that received the data. Can be used to send data back
 		:param session:	Session object for getting robot services
 		:return:		True if command was found and executed successful, false othwerwise
@@ -161,15 +168,15 @@ class NAOCommand(object):
 					args = (data['commandArguments'])
 
 				# check if module has function to set command reference
-				func = getattr( cmd, "setResolveCommandFunction", None )
+				func = getattr( cmd, "setNAOCommand", None )
 				if callable(func):
 					try:
-						cmd.setResolveCommandFunction( NAOCommand.resolveCmd )
+						cmd.setNAOCommand( NAOCommand )
 					except:
 						logging.warning( "Was not able to set resolve command function on module %s", cmd )
 
-				return start_new_thread( cmd.exe, args )
+				return Thread( target=cmd.exe, args=args )
 		
-		logging.warning( "could not find command %s", str(data) )
+		logging.warning( "Could not find command %s", str(data) )
 		return False
 
