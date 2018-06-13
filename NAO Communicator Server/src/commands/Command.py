@@ -147,7 +147,6 @@ class NAOCommand(object):
 
 				# check if module has function to set command reference
 				func = getattr( cmd, "setResolveCommandFunction", None )
-				print func
 				if callable(func):
 					try:
 						cmd.setResolveCommandFunction( NAOCommand.resolveCmd )
