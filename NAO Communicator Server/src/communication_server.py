@@ -1,10 +1,18 @@
 import os, sys, argparse
 import logging
+import signal
 from time import sleep
 
 from settings.Settings import Settings
 from network.serverManager import ServerManager
 from commands.Command import NAOCommand
+
+globalStop = False
+
+def signalHandler(signal, frame):
+	global globalStop
+	logging.error("Caught SIGINT singal, try to stop program")
+	globalStop = True
 
 
 
@@ -50,6 +58,11 @@ def parseSettings():
 
 if __name__ == '__main__':
 
+	global globalStop
+
+	# add signal handler
+	signal.signal(signal.SIGINT, signalHandler)
+
 	# parse settings
 	parseSettings();
 	logging.debug("Parsed command line options")
@@ -68,10 +81,13 @@ if __name__ == '__main__':
 	servermanager = ServerManager()
 
 	# Endlosschleife
-	while(True):
+	while not globalStop:
 		if not servermanager.manage():
 			break;
-		sleep(5)
+		sleep(2.0)
+
+	# stop running command threads
+	NAOCommand.stopThreads()
 
 	logging.error( "Terminated" )
 

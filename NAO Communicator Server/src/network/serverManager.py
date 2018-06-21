@@ -129,7 +129,7 @@ class ServerManager(object):
 	def manage(self):
 		"""
 		Manages several servers on different ips
-		:return: True if closed carefuly, false otherwise
+		:return: True if closed graceefuly, false otherwise
 		"""
 
 		# get list of ips

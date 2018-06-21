@@ -11,6 +11,7 @@ class NAOCommand(object):
 	Main command class
 	"""
 	lst = []
+	threads= {}
 	
 	@staticmethod
 	def __cleanTmp():
@@ -177,8 +178,25 @@ class NAOCommand(object):
 
 				thread = Thread( target=cmd.exe, args=args )
 				thread.start()
+				NAOCommand.threads[str(thread.ident)] = [thread, False]
+				logging.debug( "Started new thread %s", thread )
 				return thread
 		
 		logging.warning( "Could not find command %s", str(data) )
 		return False
 
+	@staticmethod
+	def shouldThreadExit(ident):
+		if ident in NAOCommand.threads:
+			return NAOCommand.threads[ident][1]
+		return False
+
+	@staticmethod
+	def stopThreads():
+		for ident in NAOCommand.threads:
+			thread = NAOCommand.threads[ ident ][0]
+			logging.debug( "Trying to stop %s", thread )
+
+			# try to stop thread
+			NAOCommand.threads[ ident ][1] = True
+			thread.join(1000)
