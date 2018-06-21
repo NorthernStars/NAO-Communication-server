@@ -19,6 +19,9 @@ def parseSettings():
 	parser.add_argument( "-rusr", "--robotuser", help="Robot login user (default: nao)", type=str, default="nao" )
 	parser.add_argument( "-rpw", "--robotpassword", help="Robot login password (default: nao)", type=str, default="nao" )
 	parser.add_argument( "-cmod", "--custommodules", help="Relative path to directory with custom modules to load (default ../custom)", type=str, default="../custom" )
+	parser.add_argument("-gdir", "--globaldir",
+						help="Absolute path to gloabl directory containing that may be loaded from command modules (default /home/nao)", type=str,
+						default="/home/nao")
 	parser.add_argument( "-sip", "--serverip", help="Server ip (default: 127.0.0.1)", type=str, default="127.0.0.1" )
 	parser.add_argument( "-sp", "--serverport", help="Server port (default: 5050)", type=int, default=5050 )
 	parser.add_argument( "-st", "--servicetype", help="Network service type (default _naocom._tcp)", type=str, default="_naocom._tcp" )
@@ -35,6 +38,7 @@ def parseSettings():
 	Settings.serverServiceType = args.servicetype
 	Settings.systemInfoRenewInterval = args.systeminforenewinterval
 	Settings.customModulesPath = args.custommodules
+	Settings.globalDirectory = args.globaldir
 
 	numeric_level = getattr(logging, args.loglevel.upper(), None)
 	if not isinstance(numeric_level, int):

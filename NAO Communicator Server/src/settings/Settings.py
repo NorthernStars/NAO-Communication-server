@@ -20,4 +20,5 @@ class Settings(object):
     memoryCustomEventsFile = "almemory_custom.events"
     memoryCustomEvents = {}
     customModulesPath = "../custom"
+    globalDirectory = "/home/nao/"
     revision = 1
