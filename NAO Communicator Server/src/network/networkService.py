@@ -4,7 +4,7 @@ Created on 15.07.2014
 @author: hannes
 '''
 from signal import SIGTERM
-from os import killpg, setsid
+from os import kill
 from subprocess import Popen, PIPE
 
 
@@ -33,7 +33,7 @@ class NetworkService(object):
 		:return:        None
 		"""
 		cmd = "avahi-publish-service " + str(name) + " " + str(regtype) + " " + str(port)
-		p = Popen( cmd, stdout=PIPE, shell=True, preexec_fn=setsid )
+		p = Popen( cmd, stdout=PIPE, shell=True )
 
 		# add service to list
 		regtype = self.__convertToListKey(regtype)
@@ -51,7 +51,7 @@ class NetworkService(object):
 		service = self.getService(name, regtype)
 		if service != None:
 
-			killpg( service.pid, SIGTERM )
+			kill( service.pid, SIGTERM )
 			self.__registeredInfo[name].pop(regtype)
 
 			if len(self.__registeredInfo[name]) < 1:
