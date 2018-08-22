@@ -58,8 +58,6 @@ def parseSettings():
 
 if __name__ == '__main__':
 
-	global globalStop
-
 	# add signal handler
 	signal.signal(signal.SIGINT, signalHandler)
 
@@ -77,17 +75,20 @@ if __name__ == '__main__':
 		os.chdir(path)
 
 	# create commands list
-	NAOCommand.addCmds()
-	servermanager = ServerManager()
+	naocommand = NAOCommand()
+	naocommand.addCmds()
+	servermanager = ServerManager(naocommand)
 
 	# Endlosschleife
 	while not globalStop:
 		if not servermanager.manage():
 			break;
 		sleep(2.0)
+	
+	logging.info( "Stopping active threads" )
 
 	# stop running command threads
-	NAOCommand.stopThreads()
+	naocommand.stopThreads()
 
 	logging.error( "Terminated" )
 

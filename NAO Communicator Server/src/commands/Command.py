@@ -11,7 +11,11 @@ class NAOCommand(object):
 	Main command class
 	"""
 	lst = []
-	threads= {}
+	threads = {}
+	
+	def __init__(self):
+		self.lst = []
+		self.threads = {}
 	
 	@staticmethod
 	def __cleanTmp():
@@ -64,16 +68,14 @@ class NAOCommand(object):
 		
 		return dirs
 
-	@staticmethod
-	def hasCommand(command):
-		for cmd in NAOCommand.lst:
+	def hasCommand(self, command):
+		for cmd in self.lst:
 			if str(cmd.cmd) == command:
 				return True
 		return False
 			
 			
-	@staticmethod
-	def addCmds():
+	def addCmds(self):
 		"""
 		Adds commands to a list (NAOCommand.lst) and returns that list
 		"""		
@@ -111,33 +113,31 @@ class NAOCommand(object):
 									# try to create object from class
 									nClassArgs = len( inspect.getargspec( cls.__init__ )[0] )
 									if nClassArgs == 2:
-										obj = cls(Settings)
+										obj = cls(self)			# add instance reference
 									elif nClassArgs == 3:
-										obj = cls(Settings, None)
+										obj = cls(self, Settings)	# add instance reference and settings
 									else:
 										obj = cls()
 								
 									# check if class is command class
 									if getattr( obj, 'cmd', None ):
-										NAOCommand.lst.append( obj )	# add to command list
+										self.lst.append( obj )	# add to command list
 										logging.debug( "imported %s", cls )
 									
 								except Exception, e:
 									logging.error( "cannot import %s\n%s", cls, e )
 									
-	@staticmethod
-	def startDefaultModules(session):
+	def startDefaultModules(self, session):
 		"""
 		Starts the modules marked as default
 		"""
 		logging.info( "loading default modules" )
-		for cmd in NAOCommand.lst:
+		for cmd in self.lst:
 			if getattr( cmd, 'default', None ):
-				NAOCommand.resolveCmd( { 'command': cmd.cmd, 'commandArguments': [] }, None, session )
+				self.resolveCmd( { 'command': cmd.cmd, 'commandArguments': [] }, None, session )
 
 	
-	@staticmethod
-	def resolveCmd(data, server, session):
+	def resolveCmd(self, data, server, session):
 		"""
 		Resolves command.
 		Command name will be used to resolve from command class argument cmd.
@@ -153,7 +153,7 @@ class NAOCommand(object):
 		'''
 		
 		# go through commands list ans search for command
-		for cmd in NAOCommand.lst:
+		for cmd in self.lst:
 			if str(cmd.cmd) == data['command']:
 				
 				# check if session is needed
@@ -168,35 +168,29 @@ class NAOCommand(object):
 				elif nFuncArgs == 2:
 					args = (data['commandArguments'])
 
-				# check if module has function to set command reference
-				func = getattr( cmd, "setNAOCommand", None )
-				if callable(func):
-					try:
-						cmd.setNAOCommand( NAOCommand )
-					except:
-						logging.warning( "Was not able to set resolve command function on module %s", cmd )
-
 				thread = Thread( target=cmd.exe, args=args )
 				thread.start()
-				NAOCommand.threads[str(thread.ident)] = [thread, False]
+				self.addThreadToWatch(thread)
 				logging.debug( "Started new thread %s", thread )
 				return thread
 		
 		logging.warning( "Could not find command %s", str(data) )
 		return False
 
-	@staticmethod
-	def shouldThreadExit(ident):
-		if ident in NAOCommand.threads:
-			return NAOCommand.threads[ident][1]
+	def shouldThreadExit(self, ident):
+		ident = str(ident)
+		if ident in self.threads:
+			return self.threads[ ident ][1]
 		return False
+		
+	def addThreadToWatch(self, thread):
+		self.threads[str(thread.ident)] = [thread, False]
 
-	@staticmethod
-	def stopThreads():
-		for ident in NAOCommand.threads:
-			thread = NAOCommand.threads[ ident ][0]
+	def stopThreads(self):
+		for ident in self.threads:
+			thread = self.threads[ ident ][0]
 			logging.debug( "Trying to stop %s", thread )
 
 			# try to stop thread
-			NAOCommand.threads[ ident ][1] = True
+			self.threads[ ident ][1] = True
 			thread.join(1000)

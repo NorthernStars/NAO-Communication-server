@@ -8,8 +8,6 @@ from time import sleep
 import logging
 import qi
 
-from commands.Command import NAOCommand
-
 class ServerManager(object):
 	"""
 	Manages several servers
@@ -22,7 +20,7 @@ class ServerManager(object):
 	__session = None
 	__sysProxy = None
 
-	def __init__(self, exceptIps=["127.0.0.1", "0.0.0.0"]):
+	def __init__(self, naocommand=None, exceptIps=["127.0.0.1", "0.0.0.0"]):
 		"""
 		Constructor
 		"""
@@ -35,7 +33,7 @@ class ServerManager(object):
 		self.__app.start()
 		self.__session = self.__app.session
 		
-		NAOCommand.startDefaultModules(self.__session)
+		naocommand.startDefaultModules(self.__session)
 
 	@staticmethod
 	def getLocalInterfaces():
