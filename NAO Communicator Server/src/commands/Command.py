@@ -42,6 +42,7 @@ class NAOCommand(object):
 			# copy files to tmp
 			packageName = d.rsplit("/")[-1]
 			shutil.copytree( d, "tmp/" + packageName )
+			logging.debug( "copying %s to %s", d, packageName )
 			
 			# add new path to dirs list
 			dirs.append( "tmp/" + packageName )
