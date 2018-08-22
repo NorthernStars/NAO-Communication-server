@@ -24,7 +24,7 @@ class NAOCommand(object):
 	@staticmethod
 	def __getUserModulesPaths():
 		dirs = []
-		for d in Settings.customModulesPath.split(","):
+		for d in Settings.customModulesPath.split(","):		
 			# check if path endswith /
 			if d.endswith("/"):
 				d = "".join( d.rsplit("/", 1) )
